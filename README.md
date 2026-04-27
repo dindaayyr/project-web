@@ -96,6 +96,13 @@ Setelah menjalankan `php spark db:setup`, Anda dapat login menggunakan:
 
 ---
 
+## 📦 Data Katalog Paket
+Seluruh daftar paket umroh yang muncul di halaman **Katalog** dikelola melalui database. Teman Anda akan mendapatkan list paket yang sama persis setelah menjalankan seeder:
+- **Lokasi File Data**: `app/Database/Seeds/DatabaseSeeder.php`
+- **Cara Update**: Ubah data di file tersebut, lalu jalankan `php spark db:setup`.
+
+---
+
 ## 📄 Lisensi
 Project ini dikembangkan untuk tujuan agregasi travel umroh eksklusif. Hak cipta © 2026 **UmrohQueens**.
 
