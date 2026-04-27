@@ -100,8 +100,8 @@
 <div id="wrapper">
     <nav id="sidebar">
         <div class="sidebar-header">
-            <h3 class="font-weight-bold mb-0">Umroh<span style="color: var(--gold-accent)">Hub</span></h3>
-            <p class="small opacity-50 mb-0">Aggregator Exclusive</p>
+            <h3 class="font-weight-bold mb-0">Umroh<span style="color: var(--gold-accent)">Queens</span></h3>
+            <p class="small opacity-50 mb-0">Admin Dashboard</p>
         </div>
         
         <div class="mt-4">
