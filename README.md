@@ -100,4 +100,3 @@ Setelah menjalankan `php spark db:setup`, Anda dapat login menggunakan:
 Project ini dikembangkan untuk tujuan agregasi travel umroh eksklusif. Hak cipta © 2026 **UmrohQueens**.
 
 ---
-*Dibuat dengan tulus oleh Balqisssssssssss🤍*
