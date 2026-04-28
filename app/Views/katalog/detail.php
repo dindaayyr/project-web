@@ -131,14 +131,12 @@
                         <li class="breadcrumb-item active text-white" aria-current="page">Detail Paket</li>
                     </ol>
                 </nav>
-                <h1 class="package-title animate__animated animate__fadeInUp"><?= esc($package['name']) ?></h1>
-                <div class="d-flex align-items-center mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
-                    <div class="badge badge-warning px-3 py-2 mr-3" style="border-radius: 10px;">
-                        <i class="fa fa-star mr-1"></i> Hotel <?= esc($package['hotel_star']) ?>★
-                    </div>
-                    <div class="text-white-50">
-                        <i class="fa fa-map-marker-alt mr-1"></i> Berangkat dari: <?= esc($package['departure_city']) ?>
-                    </div>
+                <h1 class="package-title animate__animated animate__fadeInUp"><?= esc($package['nama_paket']) ?></h1>
+                <div class="d-flex align-items-center flex-wrap mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s; gap:8px;">
+                    <div class="badge badge-warning px-3 py-2" style="border-radius: 10px;"><i class="fa-solid fa-mosque mr-1"></i> Madinah <?= ($package['bintang_madinah'] ?? 3) ?>★</div>
+                    <div class="badge badge-warning px-3 py-2" style="border-radius: 10px;"><i class="fa-solid fa-kaaba mr-1"></i> Mekkah <?= ($package['bintang_mekkah'] ?? 3) ?>★</div>
+                    <?php if (!empty($package['maskapai'])): ?><span class="badge px-3 py-2" style="background:rgba(255,255,255,0.15);color:#fff;border-radius:10px;"><i class="fa fa-plane mr-1"></i> <?= esc($package['maskapai']) ?></span><?php endif; ?>
+                    <div class="text-white-50"><i class="fa fa-map-marker-alt mr-1"></i> <?= esc($package['departure_city'] ?? '') ?></div>
                 </div>
                 
                 <div class="agent-info-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
@@ -222,25 +220,25 @@
         
         <div class="col-lg-4">
             <div class="booking-card animate__animated animate__fadeInRight">
-                <div class="price-tag">Rp <?= number_format($package['price'], 0, ',', '.') ?></div>
+                <div class="price-tag">Rp <?= number_format($package['harga_jual'], 0, ',', '.') ?></div>
                 <div class="text-muted small mb-4">Harga per jamaah (All-in)</div>
                 
                 <div class="mb-4">
                     <div class="feature-item">
                         <i class="fa fa-clock"></i>
-                        <span>Durasi <strong><?= esc($package['duration_days']) ?> Hari</strong></span>
+                        <span>Durasi <strong><?= esc($package['program_hari']) ?> Hari</strong></span>
                     </div>
                     <div class="feature-item">
                         <i class="fa fa-plane"></i>
-                        <span>Maskapai <strong><?= esc($package['airline']) ?></strong></span>
+                        <span>Maskapai <strong><?= esc($package['maskapai'] ?? '-') ?></strong></span>
                     </div>
                     <div class="feature-item">
                         <i class="fa fa-users"></i>
-                        <span>Sisa Kuota <strong><?= esc($package['quota_remaining']) ?> Kursi</strong></span>
+                        <span>Sisa Kuota <strong><?= esc($package['available_seat'] ?? 0) ?> Kursi</strong></span>
                     </div>
                     <div class="feature-item">
                         <i class="fa fa-calendar"></i>
-                        <span>Keberangkatan <strong><?= date('d M Y', strtotime($package['departure_date'])) ?></strong></span>
+                        <span>Keberangkatan <strong><?= !empty($package['tanggal_berangkat']) ? date('d M Y', strtotime($package['tanggal_berangkat'])) : '-' ?></strong></span>
                     </div>
                 </div>
                 

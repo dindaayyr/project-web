@@ -329,7 +329,7 @@
                     <h5>Hubungi Kami</h5>
                     <div class="footer-contact-item">
                         <i class="fa-solid fa-location-dot"></i>
-                        <span>Jl. Masjid Al-Haram No. 1, Jakarta</span>
+                        <span>Gunung Anyar, Surabaya, Jawa Timur</span>
                     </div>
                     <div class="footer-contact-item">
                         <i class="fa-solid fa-phone"></i>
