@@ -44,6 +44,51 @@ class AiController extends BaseController
     }
 
     /**
+     * Endpoint untuk menerima input teks dari AI Assistant (NLP).
+     * Tujuannya agar AI bisa memfilter data berdasarkan prompt user.
+     */
+    public function searchNLP()
+    {
+        $input = $this->request->getJSON(true);
+        $query = $input['query'] ?? $input['prompt'] ?? '';
+
+        if (empty($query)) {
+            return $this->fail('Query tidak boleh kosong.', 400);
+        }
+
+        $filters = $this->parsePromptWithAI($query);
+
+        $packageModel = new PackageModel();
+        $packages = $packageModel->getFiltered($filters);
+
+        // Format response for AI consumption
+        $formatted = array_map(function($pkg) {
+            return [
+                'id'              => $pkg['id'],
+                'nama_paket'      => $pkg['nama_paket'],
+                'harga'           => 'Rp ' . number_format($pkg['harga_jual'], 0, ',', '.'),
+                'harga_raw'       => (float)$pkg['harga_jual'],
+                'maskapai'        => $pkg['maskapai'],
+                'program_hari'    => $pkg['program_hari'] . ' Hari',
+                'tanggal'         => $pkg['tanggal_berangkat'],
+                'hotel_madinah'   => ($pkg['hotel_madinah'] ?? '-') . ' (' . ($pkg['bintang_madinah'] ?? 3) . '★)',
+                'hotel_mekkah'    => ($pkg['hotel_mekkah'] ?? '-') . ' (' . ($pkg['bintang_mekkah'] ?? 3) . '★)',
+                'sisa_kuota'      => $pkg['available_seat'] . '/' . $pkg['total_seat'],
+                'travel'          => $pkg['travel_name'] ?? '',
+                'url'             => base_url('/katalog/detail/' . $pkg['id']),
+            ];
+        }, $packages);
+
+        return $this->respond([
+            'status'   => 'success',
+            'query'    => $query,
+            'filters'  => $filters,
+            'total'    => count($formatted),
+            'results'  => $formatted,
+        ]);
+    }
+
+    /**
      * Parse user prompt menggunakan AI API (Gemini/OpenAI).
      * Jika API tidak tersedia, gunakan rule-based parsing sebagai fallback.
      *
@@ -80,6 +125,9 @@ class AiController extends BaseController
 
         Contoh input: 'Umroh murah 25 juta berangkat dari Jakarta'
         Contoh output: {\"max_price\": 25000000, \"departure_city\": \"Jakarta\", \"sort_by\": \"cheapest\"}
+
+        Input: 'Cari paket hotel bintang 5'
+        Output: {\"hotel_star\": 5}
 
         Hanya kembalikan JSON, tanpa penjelasan tambahan.";
 

@@ -28,8 +28,8 @@ class KatalogController extends BaseController
         }
 
         $data = [
-            'packages' => $packages,
-            'filters'  => $filters,
+            'packages'  => $packages,
+            'filters'   => $filters,
             'pageTitle' => 'Katalog Paket Umroh | UmrohQueens'
         ];
 
@@ -48,7 +48,7 @@ class KatalogController extends BaseController
 
             $data = [
                 'package'   => $package,
-                'pageTitle' => $package['name'] . ' | UmrohQueens'
+                'pageTitle' => $package['nama_paket'] . ' | UmrohQueens'
             ];
 
             return view('katalog/detail', $data);

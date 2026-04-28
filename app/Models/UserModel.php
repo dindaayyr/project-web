@@ -11,7 +11,7 @@ class UserModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $allowedFields    = ['name', 'email', 'phone', 'password', 'role', 'avatar'];
+    protected $allowedFields    = ['name', 'email', 'phone', 'password', 'role', 'avatar', 'travel_agent_id'];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';

@@ -530,9 +530,9 @@
                     <div class="col-md-4 mb-4">
                         <div class="package-card animate__animated animate__fadeInUp">
                             <div class="package-img">
-                                <img src="<?= esc($pkg['image']) ?>" alt="<?= esc($pkg['name']) ?>" loading="lazy">
+                                <img src="<?= esc($pkg['image'] ?? '') ?>" alt="<?= esc($pkg['nama_paket']) ?>" loading="lazy">
                                 <?php
-                                    $remaining = (int)$pkg['quota_remaining'];
+                                    $remaining = (int)($pkg['available_seat'] ?? 0);
                                     if ($remaining > 10) {
                                         $badgeClass = 'badge-available';
                                         $badgeText = 'Tersedia ' . $remaining . ' kursi';
@@ -550,15 +550,16 @@
                                 <div class="travel-name">
                                     <i class="fa-solid fa-building"></i> <?= esc($pkg['travel_name']) ?>
                                 </div>
-                                <h5><?= esc($pkg['name']) ?></h5>
+                                <h5><?= esc($pkg['nama_paket']) ?></h5>
                                 <div class="package-meta">
-                                    <span><i class="fa-solid fa-calendar-days"></i> <?= esc($pkg['duration_days']) ?> Hari</span>
-                                    <span><i class="fa-solid fa-star"></i> Hotel <?= esc($pkg['hotel_star']) ?>★</span>
-                                    <span><i class="fa-solid fa-plane"></i> <?= esc($pkg['airline']) ?></span>
+                                    <span><i class="fa-solid fa-calendar-days"></i> <?= esc($pkg['program_hari']) ?> Hari</span>
+                                    <span><i class="fa-solid fa-mosque"></i> <?= ($pkg['bintang_madinah'] ?? 3) ?>★</span>
+                                    <span><i class="fa-solid fa-kaaba"></i> <?= ($pkg['bintang_mekkah'] ?? 3) ?>★</span>
+                                    <span><i class="fa-solid fa-plane"></i> <?= esc($pkg['maskapai'] ?? '') ?></span>
                                 </div>
                                 <div class="package-footer">
                                     <div class="package-price">
-                                        Rp <?= number_format($pkg['price'], 0, ',', '.') ?>
+                                        Rp <?= number_format($pkg['harga_jual'], 0, ',', '.') ?>
                                         <br><small>/jamaah</small>
                                     </div>
                                     <a href="/katalog/detail/<?= $pkg['id'] ?>" class="btn btn-detail">
@@ -636,10 +637,10 @@
                 result.packages.slice(0, 3).forEach(pkg => {
                     html += `
                         <a href="/katalog/detail/${pkg.id}" class="list-group-item list-group-item-action bg-transparent border-0 px-0 py-2 text-white d-flex align-items-center">
-                            <img src="${pkg.image}" class="rounded mr-3" width="50" height="40" style="object-fit:cover;">
+                            <img src="${pkg.image || ''}" class="rounded mr-3" width="50" height="40" style="object-fit:cover;">
                             <div>
-                                <div class="font-weight-bold small">${pkg.name}</div>
-                                <div class="small" style="color:var(--gold-accent);">Rp ${new Intl.NumberFormat('id-ID').format(pkg.price)}</div>
+                                <div class="font-weight-bold small">${pkg.nama_paket}</div>
+                                <div class="small" style="color:var(--gold-accent);">Rp ${new Intl.NumberFormat('id-ID').format(pkg.harga_jual)}</div>
                             </div>
                         </a>
                     `;

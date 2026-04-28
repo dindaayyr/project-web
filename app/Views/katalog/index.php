@@ -408,47 +408,56 @@
                 <!-- Package List -->
                 <?php if (!empty($packages)): ?>
                     <?php foreach ($packages as $pkg): ?>
+                        <?php
+                            $totalSeat = (int)($pkg['total_seat'] ?? 0);
+                            $jamaah = (int)($pkg['jumlah_jamaah'] ?? 0);
+                            $avail = (int)($pkg['available_seat'] ?? $totalSeat);
+                            $pct = $totalSeat > 0 ? round(($jamaah / $totalSeat) * 100) : 0;
+                            if ($avail > 10) { $qClass='quota-green'; $qText='Tersedia '.$avail; $barC='#16a34a'; }
+                            elseif ($avail > 0) { $qClass='quota-orange'; $qText='Sisa '.$avail.'!'; $barC='#eab308'; }
+                            else { $qClass='quota-red'; $qText='SOLD OUT'; $barC='#dc2626'; }
+                            $bMad = (int)($pkg['bintang_madinah'] ?? 3);
+                            $bMek = (int)($pkg['bintang_mekkah'] ?? 3);
+                        ?>
                         <div class="katalog-card">
                             <div class="card-row">
                                 <div class="card-img-side">
-                                    <img src="<?= esc($pkg['image']) ?>" alt="<?= esc($pkg['name']) ?>" loading="lazy">
-                                    <?php
-                                        $remaining = (int)$pkg['quota_remaining'];
-                                        if ($remaining > 10) {
-                                            $qClass = 'quota-green';
-                                            $qText = 'Tersedia ' . $remaining;
-                                        } elseif ($remaining > 0) {
-                                            $qClass = 'quota-orange';
-                                            $qText = 'Sisa ' . $remaining . '!';
-                                        } else {
-                                            $qClass = 'quota-red';
-                                            $qText = 'SOLD OUT';
-                                        }
-                                    ?>
-                                    <span class="quota-badge <?= $qClass ?>">
-                                        <i class="fa fa-users mr-1"></i> <?= $qText ?>
-                                    </span>
+                                    <img src="<?= esc($pkg['image'] ?? '/assets/img/default-package.jpg') ?>" alt="<?= esc($pkg['nama_paket']) ?>" loading="lazy">
+                                    <span class="quota-badge <?= $qClass ?>"><i class="fa fa-users mr-1"></i> <?= $qText ?></span>
                                 </div>
                                 <div class="card-content">
                                     <div>
-                                        <div class="card-travel-badge">
-                                            <i class="fa-solid fa-building"></i> <?= esc($pkg['travel_name']) ?>
-                                        </div>
-                                        <h5><?= esc($pkg['name']) ?></h5>
-                                        <p class="text-muted small mb-3"><?= esc(substr($pkg['description'], 0, 120)) ?>...</p>
-                                        <div class="meta-row">
-                                            <span><i class="fa-solid fa-calendar-days"></i> <?= esc($pkg['duration_days']) ?> Hari</span>
-                                            <span><i class="fa-solid fa-star"></i> Hotel <?= esc($pkg['hotel_star']) ?>★</span>
-                                            <span><i class="fa-solid fa-plane"></i> <?= esc($pkg['airline']) ?></span>
-                                            <span><i class="fa-solid fa-map-marker-alt"></i> <?= esc($pkg['departure_city']) ?></span>
-                                            <?php if ($pkg['departure_date']): ?>
-                                                <span><i class="fa-solid fa-clock"></i> <?= date('d M Y', strtotime($pkg['departure_date'])) ?></span>
+                                        <div class="d-flex align-items-center flex-wrap mb-2" style="gap:8px;">
+                                            <div class="card-travel-badge"><i class="fa-solid fa-building"></i> <?= esc($pkg['travel_name'] ?? '') ?></div>
+                                            <?php if (!empty($pkg['maskapai'])): ?>
+                                            <span class="badge" style="background:#eef2ff;color:#4338ca;font-size:0.72rem;padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-plane mr-1"></i><?= esc($pkg['maskapai']) ?></span>
                                             <?php endif; ?>
+                                        </div>
+                                        <h5><?= esc($pkg['nama_paket']) ?></h5>
+                                        <!-- Hotel Stars -->
+                                        <div class="d-flex flex-wrap mb-2" style="gap:16px;font-size:0.78rem;color:#555;">
+                                            <span><i class="fa-solid fa-mosque mr-1" style="color:var(--emerald);"></i>Madinah: <?php for($i=0;$i<$bMad;$i++):?><i class="fa fa-star text-warning" style="font-size:0.6rem;"></i><?php endfor;?> <span style="color:#888;"><?= esc($pkg['hotel_madinah'] ?? '-') ?></span></span>
+                                            <span><i class="fa-solid fa-kaaba mr-1" style="color:var(--emerald);"></i>Mekkah: <?php for($i=0;$i<$bMek;$i++):?><i class="fa fa-star text-warning" style="font-size:0.6rem;"></i><?php endfor;?> <span style="color:#888;"><?= esc($pkg['hotel_mekkah'] ?? '-') ?></span></span>
+                                        </div>
+                                        <div class="meta-row">
+                                            <span><i class="fa-solid fa-calendar-days"></i> <?= esc($pkg['program_hari']) ?> Hari</span>
+                                            <?php if (!empty($pkg['rute'])): ?><span><i class="fa-solid fa-route"></i> <?= esc($pkg['rute']) ?></span><?php endif; ?>
+                                            <?php if (!empty($pkg['departure_city'])): ?><span><i class="fa-solid fa-map-marker-alt"></i> <?= esc($pkg['departure_city']) ?></span><?php endif; ?>
+                                            <?php if (!empty($pkg['tanggal_berangkat'])): ?><span><i class="fa-solid fa-clock"></i> <?= date('d M Y', strtotime($pkg['tanggal_berangkat'])) ?></span><?php endif; ?>
+                                        </div>
+                                        <!-- Quota Progress Bar -->
+                                        <div class="mt-2 mb-1">
+                                            <div class="d-flex justify-content-between" style="font-size:0.75rem;color:var(--text-muted);">
+                                                <span>Kuota Terisi</span><span><strong><?= $jamaah ?></strong> / <?= $totalSeat ?> seat</span>
+                                            </div>
+                                            <div style="height:6px;background:#e5e7eb;border-radius:6px;overflow:hidden;">
+                                                <div style="height:100%;width:<?= $pct ?>%;background:<?= $barC ?>;border-radius:6px;transition:width .6s;"></div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="card-price-row">
                                         <div class="card-price">
-                                            Rp <?= number_format($pkg['price'], 0, ',', '.') ?>
+                                            Rp <?= number_format($pkg['harga_jual'], 0, ',', '.') ?>
                                             <br><small>/jamaah</small>
                                         </div>
                                         <a href="/katalog/detail/<?= $pkg['id'] ?>" class="btn btn-emerald btn-sm px-4">
