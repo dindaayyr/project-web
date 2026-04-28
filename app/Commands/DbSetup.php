@@ -11,6 +11,12 @@ class DbSetup extends BaseCommand
     protected $name        = 'db:setup';
     protected $description = 'Create database, run migrations, and seed data automatically.';
 
+    /**
+     * AI AGENT PROTOCOL:
+     * If you add new database tables or fields, you MUST update App\Database\Seeds\DatabaseSeeder.php
+     * to ensure that anyone running this command gets the complete set of data.
+     */
+
     public function run(array $params)
     {
         $dbConfig = config('Database');
@@ -20,12 +26,13 @@ class DbSetup extends BaseCommand
         $user     = $default['username'];
         $pass     = $default['password'];
         $database = $default['database'];
+        $port     = $default['port'];
 
         CLI::write("Starting database setup for: $database", 'yellow');
 
         // 1. Create Database if not exists
         try {
-            $mysqli = new \mysqli($host, $user, $pass);
+            $mysqli = new \mysqli($host, $user, $pass, null, $port);
             if ($mysqli->connect_error) {
                 CLI::error("Connection failed: " . $mysqli->connect_error);
                 return;
@@ -57,7 +64,7 @@ class DbSetup extends BaseCommand
 
         // 3. Run Seeder
         CLI::write("Seeding data...", 'yellow');
-        $seeder = \Config\Services::seeder();
+        $seeder = \Config\Database::seeder();
         try {
             $seeder->call('DatabaseSeeder');
             CLI::write("Seeding completed successfully.", 'green');

@@ -1,0 +1,22 @@
+# UmrohQueens Project Rules for AI Agents (Antigravity, Copilot, etc.)
+
+You are working on the UmrohQueens project, a CodeIgniter 4 based web application.
+
+## Database Management Protocol
+To ensure that every developer (and AI) has the same data after setup, follow this strictly:
+
+1. **Schema Changes**: All database schema changes MUST be done via Migrations (`app/Database/Migrations`).
+2. **Initial/Sample Data**: Any data required for the app to function (catalog, default users, settings) MUST be added to `app/Database/Seeds/DatabaseSeeder.php`.
+3. **The Single Setup Command**: The primary command for setting up the environment is `php spark db:setup`. This command:
+   - Creates the database if it doesn't exist.
+   - Runs all migrations.
+   - Runs the `DatabaseSeeder`.
+4. **Maintenance**: If you (the AI) add a new feature that requires a new table or a new field in the catalog, you MUST:
+   - Create the migration file.
+   - Update the `DatabaseSeeder.php` with relevant sample data.
+   - Ensure `php spark db:setup` remains the "one-click" solution for others.
+
+## Tech Stack Reminders
+- Framework: CodeIgniter 4.7.x
+- DB: MySQL (Port 3307 for local XAMPP compatibility)
+- Frontend: Vanilla CSS + Modern Design Aesthetics

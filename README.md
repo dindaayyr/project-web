@@ -48,17 +48,29 @@ cp env .env
 ```
 Buka file `.env` dan pastikan pengaturan database Anda sudah benar (hostname, username, password).
 
-### 4. Setup Database Otomatis
-Jalankan perintah kustom kami untuk membuat database, tabel, dan mengisi data dummy sekaligus:
+### 4. Setup Database (One Command Solution)
+Cukup jalankan satu perintah ini untuk membuat DB, migrasi, dan mengisi data katalog secara otomatis:
 ```bash
 php spark db:setup
 ```
+*Perintah ini sudah dikonfigurasi untuk port 3307 (standar XAMPP).*
 
 ### 5. Jalankan Aplikasi
 ```bash
 php spark serve
 ```
-Aplikasi dapat diakses melalui browser di: `http://localhost:8080`
+Buka [http://localhost:8080](http://localhost:8080) di browser Anda.
+
+---
+
+## 🤖 AI & Developer Protocol (PENTING)
+
+Untuk memastikan semua orang yang melakukan `git pull` mendapatkan data yang sama, kita menggunakan **Single Command Setup Protocol**:
+
+1. **Update Data**: Jika Anda menambah fitur yang butuh tabel/kolom baru, Anda **WAJIB** membuat Migrasi.
+2. **Update Seeder**: Jika ada data baru (misal: paket umroh baru), tambahkan di `app/Database/Seeds/DatabaseSeeder.php`.
+3. **AI Coding**: Jika Anda menggunakan **Antigravity/Copilot**, AI tersebut sudah diinstruksikan melalui file `.cursorrules` untuk otomatis memperbarui seeder setiap kali ada perubahan database.
+4. **Setup Ulang**: Developer lain hanya perlu menjalankan `php spark db:setup` untuk menyamakan database mereka dengan versi terbaru.
 
 ---
 
