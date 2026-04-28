@@ -112,15 +112,15 @@
             <?php if (!empty($recommended)): ?>
                 <?php foreach ($recommended as $rec): ?>
                     <div class="recommend-card bg-white mb-3">
-                        <img src="<?= esc($rec['image']) ?>" alt="<?= esc($rec['name']) ?>" loading="lazy">
+                        <img src="<?= esc($rec['image']) ?>" alt="<?= esc($rec['nama_paket']) ?>" loading="lazy">
                         <div class="p-3">
                             <small class="text-muted"><?= esc($rec['travel_name']) ?></small>
-                            <h6 class="font-weight-bold mb-1" style="font-size: 0.85rem;"><?= esc($rec['name']) ?></h6>
+                            <h6 class="font-weight-bold mb-1" style="font-size: 0.85rem;"><?= esc($rec['nama_paket']) ?></h6>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="font-weight-bold small" style="color: var(--emerald-dark);">
-                                    Rp <?= number_format($rec['price'], 0, ',', '.') ?>
+                                    Rp <?= number_format($rec['harga_jual'], 0, ',', '.') ?>
                                 </span>
-                                <span class="small text-muted"><?= esc($rec['duration_days']) ?> hari</span>
+                                <span class="small text-muted"><?= esc($rec['program_hari']) ?> hari</span>
                             </div>
                         </div>
                     </div>
