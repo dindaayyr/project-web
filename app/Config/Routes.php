@@ -5,7 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'LandingController::index');
 
 // ===== AUTHENTICATION =====
 $routes->get('/login', 'AuthController::showLogin');
