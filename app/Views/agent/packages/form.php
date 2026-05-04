@@ -3,7 +3,8 @@
 <div class="nav-section">Menu Agen</div>
 <a class="nav-link" href="/agent/dashboard"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a>
 <a class="nav-link active" href="/agent/packages"><i class="fa-solid fa-box"></i> Kelola Paket</a>
-<a class="nav-link" href="/agent/bookings"><i class="fa-solid fa-ticket-alt"></i> Data Jamaah</a>
+<a class="nav-link" href="/agent/jamaah"><i class="fa-solid fa-users"></i> Data Jamaah</a>
+<a class="nav-link" href="/agent/bookings"><i class="fa-solid fa-ticket-alt"></i> Pemesanan</a>
 <a class="nav-link" href="/agent/disbursements"><i class="fa-solid fa-money-bill-wave"></i> Pencairan Dana</a>
 <?= $this->endSection() ?>
 <?= $this->section('page_title') ?><?= $package ? 'Edit Paket' : 'Tambah Paket Baru' ?><?= $this->endSection() ?>
