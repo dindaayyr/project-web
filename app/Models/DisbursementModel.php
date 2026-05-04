@@ -24,10 +24,10 @@ class DisbursementModel extends Model
      */
     public function getAll()
     {
-        return $this->select('disbursements.*, travel_agents.name as travel_name, bookings.booking_code, packages.nama_paket as package_name')
+        return $this->select('disbursements.*, travel_agents.name as travel_name, bookings.booking_code, paket_umroh.nama_paket as package_name')
                     ->join('travel_agents', 'travel_agents.id = disbursements.travel_agent_id')
                     ->join('bookings', 'bookings.id = disbursements.booking_id')
-                    ->join('packages', 'packages.id = bookings.package_id')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->orderBy('disbursements.created_at', 'DESC')
                     ->findAll();
     }
@@ -37,9 +37,9 @@ class DisbursementModel extends Model
      */
     public function getByAgent(int $agentId)
     {
-        return $this->select('disbursements.*, bookings.booking_code, packages.nama_paket as package_name')
+        return $this->select('disbursements.*, bookings.booking_code, paket_umroh.nama_paket as package_name')
                     ->join('bookings', 'bookings.id = disbursements.booking_id')
-                    ->join('packages', 'packages.id = bookings.package_id')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->where('disbursements.travel_agent_id', $agentId)
                     ->orderBy('disbursements.created_at', 'DESC')
                     ->findAll();

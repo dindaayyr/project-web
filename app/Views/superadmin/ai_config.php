@@ -3,7 +3,9 @@
 <div class="nav-section">Super Admin</div>
 <a class="nav-link" href="/superadmin/dashboard"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a>
 <a class="nav-link" href="/superadmin/agents"><i class="fa-solid fa-building"></i> Agen Travel</a>
+<a class="nav-link" href="/superadmin/users"><i class="fa-solid fa-users"></i> Data Jamaah</a>
 <a class="nav-link" href="/superadmin/packages"><i class="fa-solid fa-box"></i> Semua Paket</a>
+<a class="nav-link" href="/superadmin/transactions"><i class="fa-solid fa-file-invoice-dollar"></i> Transaksi</a>
 <a class="nav-link active" href="/superadmin/ai-config"><i class="fa-solid fa-robot"></i> Konfigurasi AI</a>
 <?= $this->endSection() ?>
 <?= $this->section('page_title') ?>Konfigurasi AI Assistant<?= $this->endSection() ?>

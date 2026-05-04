@@ -30,15 +30,15 @@ class DashboardController extends BaseController
         // Get recommended packages (exclude ones user already booked)
         $bookedPackageIds = array_column($bookings, 'package_id');
         $recommended = $this->packageModel
-            ->select('packages.*, travel_agents.name as travel_name')
-            ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
-            ->where('packages.status', 'active');
+            ->select('paket_umroh.*, travel_agents.name as travel_name')
+            ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+            ->where('paket_umroh.status', 'active');
 
         if (!empty($bookedPackageIds)) {
-            $recommended->whereNotIn('packages.id', $bookedPackageIds);
+            $recommended->whereNotIn('paket_umroh.id_paket', $bookedPackageIds);
         }
 
-        $recommended = $recommended->orderBy('packages.is_featured', 'DESC')
+        $recommended = $recommended->orderBy('paket_umroh.id_paket', 'DESC')
                                    ->limit(3)
                                    ->find();
 

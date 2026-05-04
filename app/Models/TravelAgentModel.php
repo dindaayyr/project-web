@@ -10,7 +10,7 @@ class TravelAgentModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $allowedFields    = ['name', 'logo', 'ppiu_number', 'address', 'city', 'phone', 'email', 'status'];
+    protected $allowedFields    = ['name', 'logo', 'ppiu_number', 'address', 'city', 'phone', 'email', 'status', 'npwp_file', 'legal_file'];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';

@@ -279,6 +279,12 @@
 
             <div class="register-link">
                 <p>Belum punya akun? <a href="/register">Daftar Sekarang</a></p>
+                <div class="mt-4 pt-3 border-top">
+                    <p class="small text-muted mb-2">Ingin memasarkan paket umroh Anda?</p>
+                    <a href="/register-agent" class="font-weight-bold" style="color: var(--emerald-dark);">
+                        <i class="fa-solid fa-handshake mr-1"></i> Daftar sebagai Mitra
+                    </a>
+                </div>
             </div>
         </div>
     </div>

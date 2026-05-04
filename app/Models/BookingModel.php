@@ -25,9 +25,9 @@ class BookingModel extends Model
      */
     public function getUserBookings(int $userId)
     {
-        return $this->select('bookings.*, packages.nama_paket as package_name, packages.tanggal_berangkat as departure_date, packages.image as package_image, travel_agents.name as travel_name')
-                    ->join('packages', 'packages.id = bookings.package_id')
-                    ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
+        return $this->select('bookings.*, paket_umroh.nama_paket as package_name, paket_umroh.tanggal_berangkat as departure_date, paket_umroh.image as package_image, travel_agents.name as travel_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
                     ->where('bookings.user_id', $userId)
                     ->orderBy('bookings.created_at', 'DESC')
                     ->findAll();
@@ -38,10 +38,10 @@ class BookingModel extends Model
      */
     public function getAgentBookings(int $agentId)
     {
-        return $this->select('bookings.*, packages.nama_paket as package_name, packages.tanggal_berangkat as departure_date, users.name as user_name, users.email as user_email, users.phone as user_phone')
-                    ->join('packages', 'packages.id = bookings.package_id')
+        return $this->select('bookings.*, paket_umroh.nama_paket as package_name, paket_umroh.tanggal_berangkat as departure_date, users.name as user_name, users.email as user_email, users.phone as user_phone')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->join('users', 'users.id = bookings.user_id')
-                    ->where('packages.travel_agent_id', $agentId)
+                    ->where('paket_umroh.travel_agent_id', $agentId)
                     ->orderBy('bookings.created_at', 'DESC')
                     ->findAll();
     }
@@ -51,11 +51,11 @@ class BookingModel extends Model
      */
     public function getSettledBookings()
     {
-        return $this->select('bookings.*, packages.nama_paket as package_name, packages.harga_jual, packages.tanggal_berangkat, packages.travel_agent_id, travel_agents.name as travel_name')
-                    ->join('packages', 'packages.id = bookings.package_id')
-                    ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
+        return $this->select('bookings.*, paket_umroh.nama_paket as package_name, paket_umroh.harga_jual, paket_umroh.tanggal_berangkat, paket_umroh.travel_agent_id, travel_agents.name as travel_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
                     ->where('bookings.status', 'lunas')
-                    ->orderBy('packages.tanggal_berangkat', 'ASC')
+                    ->orderBy('paket_umroh.tanggal_berangkat', 'ASC')
                     ->findAll();
     }
 
@@ -66,12 +66,13 @@ class BookingModel extends Model
     {
         $cutoffDate = date('Y-m-d', strtotime('+14 days'));
 
-        return $this->select('bookings.*, packages.nama_paket as package_name, packages.harga_jual, packages.tanggal_berangkat, packages.travel_agent_id, travel_agents.name as travel_name')
-                    ->join('packages', 'packages.id = bookings.package_id')
-                    ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
+        return $this->select('bookings.*, paket_umroh.nama_paket as package_name, paket_umroh.harga_jual, paket_umroh.tanggal_berangkat, paket_umroh.travel_agent_id, travel_agents.name as travel_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
                     ->where('bookings.status', 'lunas')
-                    ->where('packages.tanggal_berangkat <=', $cutoffDate)
-                    ->orderBy('packages.tanggal_berangkat', 'ASC')
+                    ->where('paket_umroh.tanggal_berangkat <=', $cutoffDate)
+                    ->orderBy('paket_umroh.tanggal_berangkat', 'ASC')
                     ->findAll();
     }
+
 }

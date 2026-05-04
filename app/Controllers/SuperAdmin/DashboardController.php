@@ -23,9 +23,9 @@ class DashboardController extends BaseController
             'totalBookings' => $bookingModel->countAll(),
             'totalUsers'    => $userModel->where('role', 'jamaah')->countAllResults(),
             'latestBookings' => $bookingModel
-                ->select('bookings.*, users.name as user_name, packages.nama_paket as package_name')
+                ->select('bookings.*, users.name as user_name, paket_umroh.nama_paket as package_name')
                 ->join('users', 'users.id = bookings.user_id')
-                ->join('packages', 'packages.id = bookings.package_id')
+                ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                 ->orderBy('bookings.created_at', 'DESC')
                 ->limit(10)
                 ->findAll(),
@@ -51,13 +51,37 @@ class DashboardController extends BaseController
 
         $data = [
             'packages' => $packageModel
-                ->select('packages.*, travel_agents.name as travel_name')
-                ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
-                ->orderBy('packages.created_at', 'DESC')
+                ->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name')
+                ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+                ->orderBy('paket_umroh.created_at', 'DESC')
                 ->findAll(),
         ];
 
         return view('superadmin/packages', $data);
+    }
+
+
+    public function users()
+    {
+        $userModel = new UserModel();
+        $data = [
+            'users' => $userModel->where('role', 'jamaah')->orderBy('created_at', 'DESC')->findAll(),
+        ];
+        return view('superadmin/users', $data);
+    }
+
+    public function transactions()
+    {
+        $bookingModel = new BookingModel();
+        $data = [
+            'bookings' => $bookingModel
+                ->select('bookings.*, users.name as user_name, paket_umroh.nama_paket as package_name')
+                ->join('users', 'users.id = bookings.user_id')
+                ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                ->orderBy('bookings.created_at', 'DESC')
+                ->findAll(),
+        ];
+        return view('superadmin/transactions', $data);
     }
 
     public function aiConfig()

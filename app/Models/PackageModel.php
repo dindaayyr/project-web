@@ -6,8 +6,8 @@ use CodeIgniter\Model;
 
 class PackageModel extends Model
 {
-    protected $table            = 'packages';
-    protected $primaryKey       = 'id';
+    protected $table            = 'paket_umroh';
+    protected $primaryKey       = 'id_paket';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $allowedFields    = [
@@ -16,11 +16,11 @@ class PackageModel extends Model
         'departure_city', 'total_seat', 'jumlah_jamaah', 'available_seat',
         'miqat_awal', 'hotel_madinah', 'bintang_madinah',
         'hotel_mekkah', 'bintang_mekkah',
-        'image', 'is_featured', 'status'
+        'image', 'is_featured', 'status', 'status_paket'
     ];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
+    protected $updatedField     = ''; // paket_umroh might not have updated_at
 
     // Model events for automatic available_seat calculation
     protected $beforeInsert = ['calculateAvailableSeat'];
@@ -58,11 +58,11 @@ class PackageModel extends Model
      */
     public function getFeatured(int $limit = 3)
     {
-        return $this->select('packages.*, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
-                    ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
-                    ->where('packages.is_featured', 1)
-                    ->where('packages.status', 'active')
-                    ->orderBy('packages.created_at', 'DESC')
+        return $this->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
+                    ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+                    ->where('paket_umroh.is_featured', 1)
+                    ->where('paket_umroh.status', 'active')
+                    ->orderBy('paket_umroh.created_at', 'DESC')
                     ->limit($limit)
                     ->find();
     }
@@ -72,51 +72,51 @@ class PackageModel extends Model
      */
     public function getFiltered(array $filters = [])
     {
-        $builder = $this->select('packages.*, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
-                        ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
-                        ->where('packages.status !=', 'inactive');
+        $builder = $this->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
+                        ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+                        ->where('paket_umroh.status !=', 'inactive');
 
         if (!empty($filters['min_price'])) {
-            $builder->where('packages.harga_jual >=', $filters['min_price']);
+            $builder->where('paket_umroh.harga_jual >=', $filters['min_price']);
         }
         if (!empty($filters['max_price'])) {
-            $builder->where('packages.harga_jual <=', $filters['max_price']);
+            $builder->where('paket_umroh.harga_jual <=', $filters['max_price']);
         }
         if (!empty($filters['duration'])) {
             if (is_array($filters['duration'])) {
-                $builder->whereIn('packages.program_hari', $filters['duration']);
+                $builder->whereIn('paket_umroh.program_hari', $filters['duration']);
             } else {
-                $builder->where('packages.program_hari', $filters['duration']);
+                $builder->where('paket_umroh.program_hari', $filters['duration']);
             }
         }
         if (!empty($filters['hotel_star'])) {
             // Filter by the higher star rating between Madinah and Mekkah
             $star = (int)$filters['hotel_star'];
             $builder->groupStart()
-                    ->where('packages.bintang_madinah >=', $star)
-                    ->orWhere('packages.bintang_mekkah >=', $star)
+                    ->where('paket_umroh.bintang_madinah >=', $star)
+                    ->orWhere('paket_umroh.bintang_mekkah >=', $star)
                     ->groupEnd();
         }
         if (!empty($filters['airline'])) {
-            $builder->like('packages.maskapai', $filters['airline']);
+            $builder->like('paket_umroh.maskapai', $filters['airline']);
         }
         if (!empty($filters['departure_city'])) {
-            $builder->like('packages.departure_city', $filters['departure_city']);
+            $builder->like('paket_umroh.departure_city', $filters['departure_city']);
         }
 
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'popular';
         switch ($sortBy) {
             case 'cheapest':
-                $builder->orderBy('packages.harga_jual', 'ASC');
+                $builder->orderBy('paket_umroh.harga_jual', 'ASC');
                 break;
             case 'fastest':
-                $builder->orderBy('packages.program_hari', 'ASC');
+                $builder->orderBy('paket_umroh.program_hari', 'ASC');
                 break;
             case 'popular':
             default:
-                $builder->orderBy('packages.is_featured', 'DESC')
-                        ->orderBy('packages.created_at', 'DESC');
+                $builder->orderBy('paket_umroh.is_featured', 'DESC')
+                        ->orderBy('paket_umroh.created_at', 'DESC');
                 break;
         }
 
@@ -128,9 +128,9 @@ class PackageModel extends Model
      */
     public function getById(int $id)
     {
-        return $this->select('packages.*, travel_agents.name as travel_name, travel_agents.logo as travel_logo, travel_agents.description as travel_desc, travel_agents.phone as travel_phone')
-                    ->join('travel_agents', 'travel_agents.id = packages.travel_agent_id')
-                    ->where('packages.id', $id)
+        return $this->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name, travel_agents.logo as travel_logo, travel_agents.description as travel_desc, travel_agents.phone as travel_phone')
+                    ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+                    ->where('paket_umroh.id_paket', $id)
                     ->first();
     }
 
@@ -139,7 +139,8 @@ class PackageModel extends Model
      */
     public function getByAgent(int $agentId)
     {
-        return $this->where('travel_agent_id', $agentId)
+        return $this->select('paket_umroh.*, paket_umroh.id_paket as id')
+                    ->where('travel_agent_id', $agentId)
                     ->orderBy('created_at', 'DESC')
                     ->findAll();
     }
@@ -162,4 +163,5 @@ class PackageModel extends Model
             'available_seat' => $newAvailable,
         ]);
     }
+
 }
