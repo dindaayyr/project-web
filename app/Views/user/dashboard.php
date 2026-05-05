@@ -68,21 +68,28 @@
                             <?php if (!empty($bookings)): ?>
                                 <?php foreach ($bookings as $booking): ?>
                                     <tr>
-                                        <td><span class="font-weight-bold"><?= esc($booking['booking_code']) ?></span></td>
-                                        <td><?= esc($booking['package_name']) ?></td>
-                                        <td><?= date('d M Y', strtotime($booking['departure_date'])) ?></td>
+                                        <td><span class="font-weight-bold"><?= esc($booking['order_id']) ?></span></td>
+                                        <td><?= esc($booking['nama_paket']) ?></td>
+                                        <td><?= date('d M Y', strtotime($booking['tanggal_berangkat'])) ?></td>
                                         <td>Rp <?= number_format($booking['total_price'], 0, ',', '.') ?></td>
                                         <td>
                                             <?php
                                                 $statusClass = [
                                                     'pending'   => 'badge-pending',
-                                                    'verified'  => 'badge-verified',
-                                                    'completed' => 'badge-completed',
-                                                    'cancelled' => 'badge-cancelled',
+                                                    'success'   => 'badge-verified',
+                                                    'failed'    => 'badge-cancelled',
+                                                    'expired'   => 'badge-cancelled',
                                                 ];
-                                                $class = $statusClass[$booking['status']] ?? 'badge-pending';
+                                                $class = $statusClass[$booking['payment_status']] ?? 'badge-pending';
+                                                
+                                                $statusLabel = [
+                                                    'pending' => 'Pending',
+                                                    'success' => 'Berhasil',
+                                                    'failed'  => 'Gagal',
+                                                    'expired' => 'Kadaluarsa'
+                                                ];
                                             ?>
-                                            <span class="badge-status <?= $class ?>"><?= ucfirst($booking['status']) ?></span>
+                                            <span class="badge-status <?= $class ?>"><?= $statusLabel[$booking['payment_status']] ?? ucfirst($booking['payment_status']) ?></span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -112,7 +119,10 @@
             <?php if (!empty($recommended)): ?>
                 <?php foreach ($recommended as $rec): ?>
                     <div class="recommend-card bg-white mb-3">
-                        <img src="<?= esc($rec['image']) ?>" alt="<?= esc($rec['nama_paket']) ?>" loading="lazy">
+                        <?php 
+                            $recImage = $rec['image'] ?? 'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=800&h=600&fit=crop';
+                        ?>
+                        <img src="<?= esc($recImage) ?>" alt="<?= esc($rec['nama_paket']) ?>" loading="lazy">
                         <div class="p-3">
                             <small class="text-muted"><?= esc($rec['travel_name']) ?></small>
                             <h6 class="font-weight-bold mb-1" style="font-size: 0.85rem;"><?= esc($rec['nama_paket']) ?></h6>

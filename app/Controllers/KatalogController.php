@@ -57,6 +57,7 @@ class KatalogController extends BaseController
             $package = $packageModel->getById($id);
 
             if (!$package) {
+                log_message('error', "Detail Paket: ID $id tidak ditemukan di database.");
                 return redirect()->to('/katalog')->with('error', 'Paket tidak ditemukan.');
             }
 

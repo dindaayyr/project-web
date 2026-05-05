@@ -25,7 +25,7 @@ class DashboardController extends BaseController
 
         // Calculate summary
         $totalSpent = array_sum(array_column($bookings, 'total_price'));
-        $activeBookings = count(array_filter($bookings, fn($b) => in_array($b['status'], ['pending', 'verified'])));
+        $activeBookings = count(array_filter($bookings, fn($b) => in_array($b['payment_status'], ['pending', 'success'])));
 
         // Get recommended packages (exclude ones user already booked)
         $bookedPackageIds = array_column($bookings, 'package_id');

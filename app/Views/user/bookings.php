@@ -15,7 +15,7 @@
                         <th>Travel</th>
                         <th>Tanggal Berangkat</th>
                         <th>Total Harga</th>
-                        <th>Status</th>
+                        <th>Status Bayar</th>
                         <th>Tanggal Booking</th>
                     </tr>
                 </thead>
@@ -23,22 +23,29 @@
                     <?php if (!empty($bookings)): ?>
                         <?php foreach ($bookings as $booking): ?>
                             <tr>
-                                <td><span class="font-weight-bold"><?= esc($booking['booking_code']) ?></span></td>
-                                <td><?= esc($booking['package_name']) ?></td>
+                                <td><span class="font-weight-bold"><?= esc($booking['order_id']) ?></span></td>
+                                <td><?= esc($booking['nama_paket']) ?></td>
                                 <td><span class="small text-muted"><?= esc($booking['travel_name']) ?></span></td>
-                                <td><?= date('d M Y', strtotime($booking['departure_date'])) ?></td>
+                                <td><?= date('d M Y', strtotime($booking['tanggal_berangkat'])) ?></td>
                                 <td>Rp <?= number_format($booking['total_price'], 0, ',', '.') ?></td>
                                 <td>
                                     <?php
                                         $statusClass = [
                                             'pending'   => 'badge-pending',
-                                            'verified'  => 'badge-verified',
-                                            'completed' => 'badge-completed',
-                                            'cancelled' => 'badge-cancelled',
+                                            'success'   => 'badge-verified', // success maps to verified style
+                                            'failed'    => 'badge-cancelled',
+                                            'expired'   => 'badge-cancelled',
                                         ];
-                                        $class = $statusClass[$booking['status']] ?? 'badge-pending';
+                                        $class = $statusClass[$booking['payment_status']] ?? 'badge-pending';
+                                        
+                                        $statusLabel = [
+                                            'pending' => 'Pending',
+                                            'success' => 'Berhasil',
+                                            'failed'  => 'Gagal',
+                                            'expired' => 'Kadaluarsa'
+                                        ];
                                     ?>
-                                    <span class="badge-status <?= $class ?>"><?= ucfirst($booking['status']) ?></span>
+                                    <span class="badge-status <?= $class ?>"><?= $statusLabel[$booking['payment_status']] ?? ucfirst($booking['payment_status']) ?></span>
                                 </td>
                                 <td class="small text-muted"><?= date('d M Y H:i', strtotime($booking['created_at'])) ?></td>
                             </tr>

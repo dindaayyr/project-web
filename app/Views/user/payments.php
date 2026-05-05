@@ -13,45 +13,33 @@
                         <th>ID Booking</th>
                         <th>Nama Paket</th>
                         <th>Total Harga</th>
+                        <th>Metode Bayar</th>
                         <th>Status Pembayaran</th>
-                        <th>Bukti Transfer</th>
-                        <th>Aksi</th>
+                        <th>Waktu Transaksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($bookings)): ?>
                         <?php foreach ($bookings as $booking): ?>
                             <tr>
-                                <td><span class="font-weight-bold"><?= esc($booking['booking_code']) ?></span></td>
-                                <td><?= esc($booking['package_name']) ?></td>
+                                <td><span class="font-weight-bold"><?= esc($booking['order_id']) ?></span></td>
+                                <td><?= esc($booking['nama_paket']) ?></td>
                                 <td>Rp <?= number_format($booking['total_price'], 0, ',', '.') ?></td>
+                                <td><span class="small font-weight-bold text-uppercase"><?= esc($booking['payment_method'] ?? 'Online') ?></span></td>
                                 <td>
                                     <?php
                                         $paymentStatus = [
-                                            'pending'   => ['Belum Bayar', 'badge-pending'],
-                                            'verified'  => ['Terverifikasi', 'badge-verified'],
-                                            'completed' => ['Lunas', 'badge-completed'],
-                                            'cancelled' => ['Dibatalkan', 'badge-cancelled'],
+                                            'pending'   => ['Menunggu', 'badge-pending'],
+                                            'success'   => ['Lunas', 'badge-verified'],
+                                            'failed'    => ['Gagal', 'badge-cancelled'],
+                                            'expired'   => ['Kadaluarsa', 'badge-cancelled'],
                                         ];
-                                        $status = $paymentStatus[$booking['status']] ?? ['Pending', 'badge-pending'];
+                                        $status = $paymentStatus[$booking['payment_status']] ?? ['Pending', 'badge-pending'];
                                     ?>
                                     <span class="badge-status <?= $status[1] ?>"><?= $status[0] ?></span>
                                 </td>
-                                <td>
-                                    <?php if ($booking['payment_proof']): ?>
-                                        <a href="#" class="text-success small"><i class="fa fa-file-image mr-1"></i>Lihat</a>
-                                    <?php else: ?>
-                                        <span class="text-muted small">-</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if ($booking['status'] === 'pending'): ?>
-                                        <button class="btn btn-sm px-3" style="background: var(--gold-accent); color: var(--emerald-dark); border-radius: 8px; font-weight: 600; font-size: 0.8rem;">
-                                            <i class="fa fa-upload mr-1"></i> Upload Bukti
-                                        </button>
-                                    <?php else: ?>
-                                        <span class="text-muted small">-</span>
-                                    <?php endif; ?>
+                                <td class="small text-muted">
+                                    <?= $booking['transaction_time'] ? date('d M Y H:i', strtotime($booking['transaction_time'])) : '-' ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

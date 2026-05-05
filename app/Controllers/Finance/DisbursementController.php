@@ -21,20 +21,14 @@ class DisbursementController extends BaseController
 
     /**
      * Show list of transactions ready for disbursement.
-     * Rule: Only show bookings where departure date is within H-14.
+     * Rule: Only show bookings where departure date is within H-14 and status is success.
      */
     public function index()
     {
         $readyBookings = $this->bookingModel->getReadyForDisbursement();
 
-        // Enrich with commission calculation
         $disbursementList = [];
         foreach ($readyBookings as $booking) {
-            // Check if disbursement already exists for this booking
-            $existing = $this->disbursementModel
-                ->where('booking_id', $booking['id'])
-                ->first();
-
             $grossAmount      = (float)$booking['total_price'];
             $commissionAmount = round($grossAmount * (self::COMMISSION_RATE / 100), 2);
             $netAmount        = $grossAmount - $commissionAmount;
@@ -45,13 +39,13 @@ class DisbursementController extends BaseController
                 'commission_rate'   => self::COMMISSION_RATE,
                 'commission_amount' => $commissionAmount,
                 'net_amount'        => $netAmount,
-                'disbursement'      => $existing, // null if not yet created
             ];
         }
 
         $data = [
             'disbursementList' => $disbursementList,
             'commissionRate'   => self::COMMISSION_RATE,
+            'pageTitle'        => 'Pencairan Dana Agen | UmrohQueens'
         ];
 
         return view('finance/disbursements', $data);
@@ -63,20 +57,24 @@ class DisbursementController extends BaseController
     public function process($bookingId)
     {
         $booking = $this->bookingModel
-            ->select('bookings.*, packages.travel_agent_id, packages.harga_jual')
-            ->join('packages', 'packages.id = bookings.package_id')
+            ->select('bookings.*, paket_umroh.travel_agent_id')
+            ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
             ->where('bookings.id', $bookingId)
-            ->where('bookings.status', 'lunas')
+            ->where('bookings.payment_status', 'success')
+            ->where('bookings.settlement_status', 'pending')
             ->first();
 
         if (!$booking) {
-            return redirect()->back()->with('error', 'Booking tidak ditemukan atau belum lunas.');
+            return redirect()->back()->with('error', 'Booking tidak ditemukan atau sudah dicairkan.');
         }
 
-        // Check if already disbursed
-        $existing = $this->disbursementModel->where('booking_id', $bookingId)->first();
-        if ($existing) {
-            return redirect()->back()->with('error', 'Pencairan untuk booking ini sudah diproses.');
+        // H-14 Check
+        $departureDate = $booking['tanggal_berangkat'] ?? null;
+        if ($departureDate) {
+            $h14Date = date('Y-m-d', strtotime('+14 days'));
+            if ($departureDate > $h14Date) {
+                return redirect()->back()->with('error', 'Pencairan hanya dapat dilakukan maksimal H-14 sebelum keberangkatan.');
+            }
         }
 
         $grossAmount      = (float)$booking['total_price'];
@@ -90,10 +88,14 @@ class DisbursementController extends BaseController
             'commission_rate'   => self::COMMISSION_RATE,
             'commission_amount' => $commissionAmount,
             'net_amount'        => $netAmount,
-            'status'            => 'processing',
-            'notes'             => 'Diproses oleh Admin Keuangan pada ' . date('d/m/Y H:i'),
+            'status'            => 'completed',
+            'disbursed_at'      => date('Y-m-d H:i:s'),
+            'notes'             => 'Pencairan otomatis disetujui oleh Finance pada ' . date('d/m/Y H:i'),
         ]);
 
-        return redirect()->back()->with('success', "Pencairan Rp " . number_format($netAmount, 0, ',', '.') . " berhasil diproses.");
+        // Update booking settlement status
+        $this->bookingModel->update($bookingId, ['settlement_status' => 'processed']);
+
+        return redirect()->back()->with('success', "Pencairan Rp " . number_format($netAmount, 0, ',', '.') . " ke Agen berhasil diproses.");
     }
 }

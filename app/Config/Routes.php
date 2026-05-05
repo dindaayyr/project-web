@@ -101,7 +101,12 @@ $routes->get('admin/travel', function() {
 // ===== API =====
 $routes->post('/api/ai/search', 'Api\AiController::search');
 $routes->post('/api/ai/search-nlp', 'Api\AiController::searchNLP');
-$routes->post('/api/midtrans/webhook', 'Api\MidtransWebhook::handle');
+$routes->post('/api/midtrans/webhook', 'BookingController::notification');
+$routes->get('/booking/checkout/(:num)', 'BookingController::checkout/$1');
+$routes->post('/booking/store', 'BookingController::store');
+$routes->get('/booking/success', 'BookingController::success');
+$routes->get('/booking/pending', 'BookingController::pending');
+$routes->get('/booking/failed', 'BookingController::failed');
 
 // Halaman Publik
 $routes->get('/berita', 'PageController::berita');
@@ -109,4 +114,4 @@ $routes->get('/tentang', 'PageController::tentang');
 
 // Katalog
 $routes->get('/katalog', 'KatalogController::index');
-$routes->get('/katalog/(:num)', 'KatalogController::detail/$1');
+$routes->get('/katalog/detail/(:num)', 'KatalogController::detail/$1');

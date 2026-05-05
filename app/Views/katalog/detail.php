@@ -245,6 +245,25 @@
                 <div class="price-tag">Rp <?= number_format($package['harga_jual'], 0, ',', '.') ?></div>
                 <div class="text-muted small mb-4">Harga per jamaah (All-in)</div>
                 
+                <!-- Progress Kuota -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="small font-weight-bold">Ketersediaan Kursi</span>
+                        <span class="small"><?= esc($package['jumlah_jamaah'] ?? 0) ?>/<?= esc($package['total_seat'] ?? 0) ?> Terisi</span>
+                    </div>
+                    <?php 
+                        $percent = ($package['total_seat'] > 0) ? ($package['jumlah_jamaah'] / $package['total_seat']) * 100 : 0;
+                        $barColor = ($percent > 80) ? 'bg-danger' : (($percent > 50) ? 'bg-warning' : 'bg-success');
+                    ?>
+                    <div class="progress" style="height: 10px; border-radius: 5px;">
+                        <div class="progress-bar <?= $barColor ?>" role="progressbar" style="width: <?= $percent ?>%" 
+                             aria-valuenow="<?= $percent ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="text-right mt-1">
+                        <small class="text-muted"><?= esc($package['available_seat'] ?? 0) ?> Kursi Tersisa</small>
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <div class="feature-item">
                         <i class="fa fa-clock"></i>
@@ -255,8 +274,8 @@
                         <span>Maskapai <strong><?= esc($package['maskapai'] ?? '-') ?></strong></span>
                     </div>
                     <div class="feature-item">
-                        <i class="fa fa-users"></i>
-                        <span>Sisa Kuota <strong><?= esc($package['available_seat'] ?? 0) ?> Kursi</strong></span>
+                        <i class="fa-solid fa-route"></i>
+                        <span>Rute <strong><?= esc($package['rute'] ?? '-') ?></strong></span>
                     </div>
                     <div class="feature-item">
                         <i class="fa fa-calendar"></i>
@@ -266,17 +285,46 @@
                 
                 <hr>
                 
+                <div class="mb-4">
+                    <h6 class="font-weight-bold small text-uppercase text-muted mb-3">Informasi Akomodasi</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa-solid fa-mosque text-emerald-dark mr-3" style="width: 20px; text-align: center;"></i>
+                        <div>
+                            <div class="small font-weight-bold text-dark"><?= esc($package['hotel_madinah'] ?? 'Hotel Madinah') ?></div>
+                            <div class="text-warning small">
+                                <?php for($i=0; $i<($package['bintang_madinah'] ?? 0); $i++): ?><i class="fa fa-star"></i><?php endfor; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-kaaba text-emerald-dark mr-3" style="width: 20px; text-align: center;"></i>
+                        <div>
+                            <div class="small font-weight-bold text-dark"><?= esc($package['hotel_mekkah'] ?? 'Hotel Mekkah') ?></div>
+                            <div class="text-warning small">
+                                <?php for($i=0; $i<($package['bintang_mekkah'] ?? 0); $i++): ?><i class="fa fa-star"></i><?php endfor; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                
                 <?php if(session()->get('logged_in')): ?>
-                    <button class="btn btn-book">Pesan Sekarang</button>
-                    <p class="text-center small text-muted mt-3 mb-0">Klik pesan untuk melanjutkan ke pembayaran</p>
+                    <?php if(($package['available_seat'] ?? 0) > 0): ?>
+                        <a href="/booking/checkout/<?= $package['id'] ?>" class="btn btn-book">Booking Sekarang</a>
+                        <p class="text-center small text-muted mt-3 mb-0">Klik booking untuk melanjutkan pembayaran</p>
+                    <?php else: ?>
+                        <button class="btn btn-secondary btn-block" disabled style="border-radius: 14px; padding: 16px;">Kuota Penuh</button>
+                    <?php endif; ?>
                 <?php else: ?>
-                    <a href="/login?redirect=katalog/detail/<?= $package['id'] ?>" class="btn btn-book">Login untuk Pesan</a>
+                    <a href="/login?redirect=booking/checkout/<?= $package['id'] ?>" class="btn btn-book">Login untuk Booking</a>
                     <p class="text-center small text-muted mt-3 mb-0">Anda harus login terlebih dahulu</p>
                 <?php endif; ?>
                 
                 <div class="mt-4 text-center">
-                    <a href="https://wa.me/<?= esc($package['travel_phone']) ?>" class="btn btn-outline-success btn-block" style="border-radius: 14px; border-width: 2px; font-weight: 600;">
-                        <i class="fa-brands fa-whatsapp mr-2"></i> Tanya via WhatsApp
+                    <a href="https://wa.me/<?= esc($package['travel_phone']) ?>?text=Halo%20<?= urlencode($package['travel_name']) ?>%2C%20saya%20ingin%20tanya%20tentang%20paket%20<?= urlencode($package['nama_paket']) ?>" 
+                       class="btn btn-outline-success btn-block" style="border-radius: 14px; border-width: 2px; font-weight: 600;">
+                        <i class="fa-brands fa-whatsapp mr-2"></i> Konsultasi WhatsApp
                     </a>
                 </div>
             </div>

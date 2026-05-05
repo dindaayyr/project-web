@@ -30,7 +30,7 @@ class DashboardController extends BaseController
         $activePackages  = count(array_filter($packages, fn($p) => $p['status'] === 'active'));
         $totalBookings   = count($bookings);
         $totalRevenue    = array_sum(array_column(
-            array_filter($bookings, fn($b) => $b['status'] === 'lunas'),
+            array_filter($bookings, fn($b) => $b['payment_status'] === 'success'),
             'total_price'
         ));
 

@@ -20,7 +20,7 @@ class PackageModel extends Model
     ];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
-    protected $updatedField     = ''; // paket_umroh might not have updated_at
+    protected $updatedField     = '';
 
     // Model events for automatic available_seat calculation
     protected $beforeInsert = ['calculateAvailableSeat'];
@@ -36,11 +36,9 @@ class PackageModel extends Model
         $totalSeat     = $d['total_seat'] ?? null;
         $jumlahJamaah  = $d['jumlah_jamaah'] ?? null;
 
-        // If both values are present in the payload, calculate
         if ($totalSeat !== null && $jumlahJamaah !== null) {
             $data['data']['available_seat'] = (int)$totalSeat - (int)$jumlahJamaah;
         }
-        // If only one is present, fetch the other from DB (for update scenarios)
         elseif (isset($data['id'])) {
             $existing = $this->find($data['id']);
             if ($existing) {
@@ -90,7 +88,6 @@ class PackageModel extends Model
             }
         }
         if (!empty($filters['hotel_star'])) {
-            // Filter by the higher star rating between Madinah and Mekkah
             $star = (int)$filters['hotel_star'];
             $builder->groupStart()
                     ->where('paket_umroh.bintang_madinah >=', $star)
@@ -104,7 +101,6 @@ class PackageModel extends Model
             $builder->like('paket_umroh.departure_city', $filters['departure_city']);
         }
 
-        // Sorting
         $sortBy = $filters['sort_by'] ?? 'popular';
         switch ($sortBy) {
             case 'cheapest':
@@ -123,10 +119,6 @@ class PackageModel extends Model
         return $builder->findAll();
     }
 
-    /**
-     * Get all active packages with filters (PAGINATED)
-     * Uses CI4's built-in pager library.
-     */
     public function getFilteredPaginated(array $filters = [], int $perPage = 9)
     {
         $this->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
@@ -160,7 +152,6 @@ class PackageModel extends Model
             $this->like('paket_umroh.departure_city', $filters['departure_city']);
         }
 
-        // Sorting
         $sortBy = $filters['sort_by'] ?? 'popular';
         switch ($sortBy) {
             case 'cheapest':
@@ -190,9 +181,6 @@ class PackageModel extends Model
                     ->first();
     }
 
-    /**
-     * Get packages owned by a specific travel agent
-     */
     public function getByAgent(int $agentId)
     {
         return $this->select('paket_umroh.*, paket_umroh.id_paket as id')
@@ -201,9 +189,6 @@ class PackageModel extends Model
                     ->findAll();
     }
 
-    /**
-     * Decrement available seat when a booking is confirmed
-     */
     public function decrementSeat(int $packageId, int $qty = 1): bool
     {
         $package = $this->find($packageId);
