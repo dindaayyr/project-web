@@ -9,37 +9,43 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // Seed Super Admin
-        $this->db->table('users')->insert([
-            'name'       => 'Super Admin',
-            'email'      => 'admin@umrohqueens.com',
-            'phone'      => '08123456789',
-            'password'   => password_hash('admin123', PASSWORD_DEFAULT),
-            'role'       => 'superadmin',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        if ($this->db->table('users')->where('email', 'admin@umrohqueens.com')->countAllResults() == 0) {
+            $this->db->table('users')->insert([
+                'name'       => 'Super Admin',
+                'email'      => 'admin@umrohqueens.com',
+                'phone'      => '08123456789',
+                'password'   => password_hash('admin123', PASSWORD_DEFAULT),
+                'role'       => 'superadmin',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         // Seed Jamaah User
-        $this->db->table('users')->insert([
-            'name'       => 'Siti Aisyah',
-            'email'      => 'siti@email.com',
-            'phone'      => '08567891234',
-            'password'   => password_hash('jamaah123', PASSWORD_DEFAULT),
-            'role'       => 'jamaah',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        if ($this->db->table('users')->where('email', 'siti@email.com')->countAllResults() == 0) {
+            $this->db->table('users')->insert([
+                'name'       => 'Siti Aisyah',
+                'email'      => 'siti@email.com',
+                'phone'      => '08567891234',
+                'password'   => password_hash('jamaah123', PASSWORD_DEFAULT),
+                'role'       => 'jamaah',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         // Seed Finance Admin
-        $this->db->table('users')->insert([
-            'name'       => 'Admin Keuangan',
-            'email'      => 'finance@umrohqueens.com',
-            'phone'      => '08111222333',
-            'password'   => password_hash('finance123', PASSWORD_DEFAULT),
-            'role'       => 'finance',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        if ($this->db->table('users')->where('email', 'finance@umrohqueens.com')->countAllResults() == 0) {
+            $this->db->table('users')->insert([
+                'name'       => 'Admin Keuangan',
+                'email'      => 'finance@umrohqueens.com',
+                'phone'      => '08111222333',
+                'password'   => password_hash('finance123', PASSWORD_DEFAULT),
+                'role'       => 'finance',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         // Seed Travel Agents
         $agents = [

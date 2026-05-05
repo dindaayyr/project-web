@@ -14,7 +14,7 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-CI_ENVIRONMENT = development
+#CI_ENVIRONMENT = development
 
 #--------------------------------------------------------------------
 # APP
@@ -35,13 +35,13 @@ app.baseURL = 'http://localhost:8080'
 # DATABASE
 #--------------------------------------------------------------------
 
-database.default.hostname = localhost
-database.default.database = umrohqueens_db
-database.default.username = root
-database.default.password = 
-database.default.DBDriver = MySQLi
-database.default.DBPrefix =
-database.default.port = 3307
+#database.default.hostname = localhost
+#database.default.database = umrohqueens_db
+#database.default.username = root
+#database.default.password = 
+#database.default.DBDriver = MySQLi
+#database.default.DBPrefix =
+#database.default.port = 3306
 
 # database.tests.hostname = localhost
 # database.tests.database = 

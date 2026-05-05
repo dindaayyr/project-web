@@ -187,10 +187,20 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s;
+        transition: transform 0.5s ease;
     }
     .katalog-card:hover .card-img-side img {
         transform: scale(1.08);
+    }
+    .katalog-card .card-img-side::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background: linear-gradient(transparent, rgba(0,0,0,0.15));
+        pointer-events: none;
     }
     .katalog-card .card-content {
         flex: 1;
@@ -285,6 +295,37 @@
         margin-bottom: 15px;
     }
 
+    /* Pagination Custom Styling */
+    .pagination .page-item .page-link {
+        color: var(--emerald-dark);
+        border: 2px solid #e5e7eb;
+        border-radius: 10px !important;
+        margin: 0 3px;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+    .pagination .page-item .page-link:hover {
+        background: var(--emerald-50);
+        border-color: var(--emerald);
+        color: var(--emerald-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--emerald-dark), var(--emerald));
+        border-color: var(--emerald-dark);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(6, 78, 59, 0.3);
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #9ca3af;
+        border-color: #f1f5f9;
+        background: #f9fafb;
+    }
+
     @media (max-width: 768px) {
         .katalog-card .card-img-side {
             width: 100%;
@@ -293,6 +334,10 @@
         .sort-bar {
             flex-direction: column;
             text-align: center;
+        }
+        .pagination .page-link {
+            padding: 6px 10px;
+            font-size: 0.8rem;
         }
     }
 </style>
@@ -386,7 +431,7 @@
                 <!-- Sort Bar -->
                 <div class="sort-bar">
                     <div class="result-count">
-                        Ditemukan <span><?= count($packages) ?></span> paket umroh
+                        Ditemukan <span><?= $totalCount ?? count($packages) ?></span> paket umroh
                     </div>
                     <div class="sort-buttons">
                         <?php $currentSort = $filters['sort_by'] ?? 'popular'; ?>
@@ -418,11 +463,37 @@
                             else { $qClass='quota-red'; $qText='SOLD OUT'; $barC='#dc2626'; }
                             $bMad = (int)($pkg['bintang_madinah'] ?? 3);
                             $bMek = (int)($pkg['bintang_mekkah'] ?? 3);
+
+                            // Image fallback: poster_paket > image > Unsplash placeholder
+                            $placeholders = [
+                                'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1466442929976-97f336a657be?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1542296332-2e4473faf563?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1585036156171-384164a8c248?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?w=600&h=450&fit=crop',
+                                'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=600&h=450&fit=crop',
+                            ];
+                            $pkgImage = $pkg['poster_paket'] ?? $pkg['image'] ?? '';
+                            // Validate: must be a URL or a local file with a valid image extension
+                            if (!empty($pkgImage) && !str_starts_with($pkgImage, 'http')) {
+                                $ext = strtolower(pathinfo($pkgImage, PATHINFO_EXTENSION));
+                                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif']) || !file_exists(FCPATH . ltrim($pkgImage, '/'))) {
+                                    $pkgImage = '';
+                                }
+                            }
+                            if (empty($pkgImage)) {
+                                $pkgImage = $placeholders[($pkg['id_paket'] ?? $pkg['id'] ?? 0) % count($placeholders)];
+                            }
+                            $fallbackImg = $placeholders[($pkg['id_paket'] ?? $pkg['id'] ?? 0) % count($placeholders)];
                         ?>
                         <div class="katalog-card">
                             <div class="card-row">
                                 <div class="card-img-side">
-                                    <img src="<?= esc($pkg['image'] ?? '/assets/img/default-package.jpg') ?>" alt="<?= esc($pkg['nama_paket']) ?>" loading="lazy">
+                                    <img src="<?= esc($pkgImage) ?>" alt="<?= esc($pkg['nama_paket']) ?>" loading="lazy"
+                                         onerror="this.onerror=null;this.src='<?= esc($fallbackImg) ?>';">
                                     <span class="quota-badge <?= $qClass ?>"><i class="fa fa-users mr-1"></i> <?= $qText ?></span>
                                 </div>
                                 <div class="card-content">
@@ -468,6 +539,19 @@
                             </div>
                         </div>
                     <?php endforeach; ?>
+
+                    <!-- Pagination -->
+                    <?php if (isset($pager) && $pager !== null && $pager->getPageCount() > 1): ?>
+                        <div class="d-flex justify-content-center mt-4 mb-3">
+                            <?= $pager->links('default', 'bootstrap4') ?>
+                        </div>
+                        <div class="text-center mb-2">
+                            <small class="text-muted">
+                                Halaman <?= $pager->getCurrentPage() ?> dari <?= $pager->getPageCount() ?>
+                            </small>
+                        </div>
+                    <?php endif; ?>
+
                 <?php else: ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-search"></i>

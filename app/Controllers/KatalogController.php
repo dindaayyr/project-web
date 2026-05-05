@@ -19,18 +19,32 @@ class KatalogController extends BaseController
         ];
 
         $packages = [];
+        $pager = null;
+        $totalCount = 0;
 
         try {
             $packageModel = new PackageModel();
-            $packages = $packageModel->getFiltered($filters);
+            $packages = $packageModel->getFilteredPaginated($filters, 9);
+            $pager = $packageModel->pager;
+
+            // Get total count across all pages for display
+            $totalCount = $pager->getTotal();
         } catch (\Exception $e) {
             log_message('warning', 'KatalogController: Database not available - ' . $e->getMessage());
         }
 
+        // Build query string for pagination links (preserve filters)
+        $queryParams = array_filter($filters, function($v) {
+            return $v !== null && $v !== '';
+        });
+
         $data = [
-            'packages'  => $packages,
-            'filters'   => $filters,
-            'pageTitle' => 'Katalog Paket Umroh | UmrohQueens'
+            'packages'    => $packages,
+            'filters'     => $filters,
+            'pager'       => $pager,
+            'totalCount'  => $totalCount,
+            'queryParams' => $queryParams,
+            'pageTitle'   => 'Katalog Paket Umroh | UmrohQueens'
         ];
 
         return view('katalog/index', $data);

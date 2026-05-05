@@ -151,7 +151,29 @@
                 </div>
             </div>
             <div class="col-lg-5 text-right d-none d-lg-block">
-                <img src="<?= esc($package['image']) ?>" class="gallery-img animate__animated animate__zoomIn" alt="Main image">
+                <?php
+                    $detailPlaceholders = [
+                        'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=800&h=600&fit=crop',
+                        'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=800&h=600&fit=crop',
+                        'https://images.unsplash.com/photo-1466442929976-97f336a657be?w=800&h=600&fit=crop',
+                        'https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&h=600&fit=crop',
+                        'https://images.unsplash.com/photo-1585036156171-384164a8c248?w=800&h=600&fit=crop',
+                        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+                    ];
+                    $detailImage = $package['poster_paket'] ?? $package['image'] ?? '';
+                    if (!empty($detailImage) && !str_starts_with($detailImage, 'http')) {
+                        $ext = strtolower(pathinfo($detailImage, PATHINFO_EXTENSION));
+                        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif']) || !file_exists(FCPATH . ltrim($detailImage, '/'))) {
+                            $detailImage = '';
+                        }
+                    }
+                    if (empty($detailImage)) {
+                        $detailImage = $detailPlaceholders[($package['id_paket'] ?? $package['id'] ?? 0) % count($detailPlaceholders)];
+                    }
+                    $detailFallback = $detailPlaceholders[($package['id_paket'] ?? $package['id'] ?? 0) % count($detailPlaceholders)];
+                ?>
+                <img src="<?= esc($detailImage) ?>" class="gallery-img animate__animated animate__zoomIn" alt="<?= esc($package['nama_paket']) ?>"
+                     onerror="this.onerror=null;this.src='<?= esc($detailFallback) ?>';">
             </div>
         </div>
     </div>

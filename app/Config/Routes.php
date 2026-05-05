@@ -5,7 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'LandingController::index');
 
 // ===== AUTHENTICATION =====
 $routes->get('/login', 'AuthController::showLogin');
@@ -102,6 +102,10 @@ $routes->get('admin/travel', function() {
 $routes->post('/api/ai/search', 'Api\AiController::search');
 $routes->post('/api/ai/search-nlp', 'Api\AiController::searchNLP');
 $routes->post('/api/midtrans/webhook', 'Api\MidtransWebhook::handle');
+
+// Halaman Publik
+$routes->get('/berita', 'PageController::berita');
+$routes->get('/tentang', 'PageController::tentang');
 
 // Katalog
 $routes->get('/katalog', 'KatalogController::index');

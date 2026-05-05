@@ -16,7 +16,7 @@ class PackageModel extends Model
         'departure_city', 'total_seat', 'jumlah_jamaah', 'available_seat',
         'miqat_awal', 'hotel_madinah', 'bintang_madinah',
         'hotel_mekkah', 'bintang_mekkah',
-        'image', 'is_featured', 'status', 'status_paket'
+        'image', 'poster_paket', 'is_featured', 'status', 'status_paket'
     ];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
@@ -121,6 +121,62 @@ class PackageModel extends Model
         }
 
         return $builder->findAll();
+    }
+
+    /**
+     * Get all active packages with filters (PAGINATED)
+     * Uses CI4's built-in pager library.
+     */
+    public function getFilteredPaginated(array $filters = [], int $perPage = 9)
+    {
+        $this->select('paket_umroh.*, paket_umroh.id_paket as id, travel_agents.name as travel_name, travel_agents.logo as travel_logo')
+             ->join('travel_agents', 'travel_agents.id = paket_umroh.travel_agent_id')
+             ->where('paket_umroh.status !=', 'inactive');
+
+        if (!empty($filters['min_price'])) {
+            $this->where('paket_umroh.harga_jual >=', $filters['min_price']);
+        }
+        if (!empty($filters['max_price'])) {
+            $this->where('paket_umroh.harga_jual <=', $filters['max_price']);
+        }
+        if (!empty($filters['duration'])) {
+            if (is_array($filters['duration'])) {
+                $this->whereIn('paket_umroh.program_hari', $filters['duration']);
+            } else {
+                $this->where('paket_umroh.program_hari', $filters['duration']);
+            }
+        }
+        if (!empty($filters['hotel_star'])) {
+            $star = (int)$filters['hotel_star'];
+            $this->groupStart()
+                 ->where('paket_umroh.bintang_madinah >=', $star)
+                 ->orWhere('paket_umroh.bintang_mekkah >=', $star)
+                 ->groupEnd();
+        }
+        if (!empty($filters['airline'])) {
+            $this->like('paket_umroh.maskapai', $filters['airline']);
+        }
+        if (!empty($filters['departure_city'])) {
+            $this->like('paket_umroh.departure_city', $filters['departure_city']);
+        }
+
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'popular';
+        switch ($sortBy) {
+            case 'cheapest':
+                $this->orderBy('paket_umroh.harga_jual', 'ASC');
+                break;
+            case 'fastest':
+                $this->orderBy('paket_umroh.program_hari', 'ASC');
+                break;
+            case 'popular':
+            default:
+                $this->orderBy('paket_umroh.is_featured', 'DESC')
+                     ->orderBy('paket_umroh.created_at', 'DESC');
+                break;
+        }
+
+        return $this->paginate($perPage);
     }
 
     /**

@@ -72,6 +72,11 @@
             color: var(--emerald) !important;
             background: var(--emerald-50);
         }
+        .nav-link-custom.active {
+            color: var(--emerald) !important;
+            background: var(--emerald-50);
+            font-weight: 600;
+        }
         .btn-nav-login {
             background: transparent;
             color: var(--emerald-dark) !important;
@@ -253,16 +258,16 @@
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/">Beranda</a>
+                        <a class="nav-link nav-link-custom <?= url_is('/') ? 'active' : '' ?>" href="/">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/katalog">Katalog Paket</a>
+                        <a class="nav-link nav-link-custom <?= url_is('katalog*') ? 'active' : '' ?>" href="/katalog">Katalog Paket</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="#">Berita</a>
+                        <a class="nav-link nav-link-custom <?= url_is('berita*') ? 'active' : '' ?>" href="/berita">Berita</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="#">Tentang</a>
+                        <a class="nav-link nav-link-custom <?= url_is('tentang*') ? 'active' : '' ?>" href="/tentang">Tentang</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center mt-3 mt-lg-0">
@@ -312,8 +317,8 @@
                     <ul class="footer-links">
                         <li><a href="/">Beranda</a></li>
                         <li><a href="/katalog">Katalog Paket</a></li>
-                        <li><a href="#">Berita Umroh</a></li>
-                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="/berita">Berita Umroh</a></li>
+                        <li><a href="/tentang">Tentang Kami</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-4 mb-4">
