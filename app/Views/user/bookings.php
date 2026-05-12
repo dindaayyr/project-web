@@ -1,4 +1,17 @@
-<?= $this->extend('layouts/user') ?>
+<?= $this->extend('layouts/admin') ?>
+
+<?= $this->section('sidebar') ?>
+<div class="nav-section">Menu Jamaah</div>
+<a class="nav-link" href="/user/dashboard"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a>
+<a class="nav-link active" href="/user/bookings"><i class="fa-solid fa-kaaba"></i> Booking Saya</a>
+<a class="nav-link" href="/user/documents"><i class="fa-solid fa-file-invoice"></i> Dokumen</a>
+<a class="nav-link" href="/user/payments"><i class="fa-solid fa-credit-card"></i> Riwayat Bayar</a>
+
+<div class="nav-section">Layanan</div>
+<a class="nav-link" href="/katalog"><i class="fa-solid fa-search"></i> Cari Paket</a>
+<?= $this->endSection() ?>
+
+<?= $this->section('page_title') ?>Pemesanan Saya<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <div class="card card-elegant animate__animated animate__fadeInUp">

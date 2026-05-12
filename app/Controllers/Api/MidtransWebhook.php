@@ -50,9 +50,9 @@ class MidtransWebhook extends BaseController
             }
         }
 
-        // Find booking by order_id (which maps to booking_code)
+        // Find booking by order_id
         $bookingModel = new BookingModel();
-        $booking = $bookingModel->where('booking_code', $orderId)->first();
+        $booking = $bookingModel->where('order_id', $orderId)->first();
 
         if (!$booking) {
             log_message('error', "Midtrans Webhook: Booking not found for order_id={$orderId}");
@@ -65,9 +65,9 @@ class MidtransWebhook extends BaseController
 
             // 1. Update booking status to 'lunas'
             $bookingModel->update($booking['id'], [
-                'status'                  => 'lunas',
+                'payment_status'          => 'lunas',
                 'midtrans_transaction_id' => $transactionId,
-                'payment_type'            => $paymentType,
+                'payment_method'          => $paymentType,
                 'paid_at'                 => date('Y-m-d H:i:s'),
             ]);
 
@@ -83,7 +83,7 @@ class MidtransWebhook extends BaseController
         } elseif ($transactionStatus === 'cancel' || $transactionStatus === 'deny' || $transactionStatus === 'expire') {
 
             $bookingModel->update($booking['id'], [
-                'status'                  => 'cancelled',
+                'payment_status'          => 'cancelled',
                 'midtrans_transaction_id' => $transactionId,
             ]);
 

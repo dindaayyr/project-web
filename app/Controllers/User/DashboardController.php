@@ -5,16 +5,19 @@ namespace App\Controllers\User;
 use App\Controllers\BaseController;
 use App\Models\BookingModel;
 use App\Models\PackageModel;
+use App\Models\DocumentModel;
 
 class DashboardController extends BaseController
 {
     protected $bookingModel;
     protected $packageModel;
+    protected $docModel;
 
     public function __construct()
     {
         $this->bookingModel = new BookingModel();
         $this->packageModel = new PackageModel();
+        $this->docModel     = new DocumentModel();
     }
 
     public function index()
@@ -65,7 +68,50 @@ class DashboardController extends BaseController
 
     public function documents()
     {
-        return view('user/documents');
+        $userId = session()->get('user_id');
+        $data = [
+            'docs' => $this->docModel->getByUser($userId)
+        ];
+        return view('user/documents', $data);
+    }
+
+    public function uploadDocuments()
+    {
+        $userId = session()->get('user_id');
+        $files = $this->request->getFiles();
+
+        if ($files) {
+            foreach ($files as $type => $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    // Define folder and name
+                    $newName = $userId . '_' . $type . '_' . $file->getRandomName();
+                    $file->move(FCPATH . 'uploads/documents', $newName);
+                    
+                    $filePath = 'uploads/documents/' . $newName;
+
+                    // Check if already exists
+                    $existing = $this->docModel->where('user_id', $userId)->where('doc_type', $type)->first();
+                    
+                    if ($existing) {
+                        $this->docModel->update($existing['id'], [
+                            'file_path' => $filePath,
+                            'status'    => 'pending',
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ]);
+                    } else {
+                        $this->docModel->insert([
+                            'user_id'   => $userId,
+                            'doc_type'  => $type,
+                            'file_path' => $filePath,
+                            'status'    => 'pending'
+                        ]);
+                    }
+                }
+            }
+            return redirect()->to('/user/documents')->with('success', 'Dokumen berhasil diunggah dan sedang menunggu verifikasi.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengunggah dokumen.');
     }
 
     public function payments()

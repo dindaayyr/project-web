@@ -26,7 +26,10 @@ class BookingModel extends Model
      */
     public function getWithPackage(string $orderId)
     {
-        return $this->select('bookings.*, paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
                     ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
                     ->where('bookings.order_id', $orderId)
@@ -38,7 +41,10 @@ class BookingModel extends Model
      */
     public function getAgentBookings(int $agentId)
     {
-        return $this->select('bookings.*, paket_umroh.nama_paket, paket_umroh.tanggal_berangkat')
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat')
                     ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->where('bookings.travel_agent_id', $agentId)
                     ->orderBy('bookings.created_at', 'DESC')
@@ -50,7 +56,10 @@ class BookingModel extends Model
      */
     public function getUserBookings(int $userId)
     {
-        return $this->select('bookings.*, paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
                     ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
                     ->where('bookings.user_id', $userId)
@@ -65,13 +74,32 @@ class BookingModel extends Model
     {
         $h14Date = date('Y-m-d', strtotime('+14 days'));
 
-        return $this->select('bookings.*, paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
                     ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                     ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
                     ->where('bookings.payment_status', 'success')
                     ->where('bookings.settlement_status', 'pending')
                     ->where('paket_umroh.tanggal_berangkat <=', $h14Date)
                     ->orderBy('paket_umroh.tanggal_berangkat', 'ASC')
+                    ->findAll();
+    }
+
+    /**
+     * Get settled bookings (used by Finance Dashboard)
+     */
+    public function getSettledBookings()
+    {
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, travel_agents.name as travel_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
+                    ->whereIn('bookings.payment_status', ['success', 'lunas', 'settlement'])
+                    ->orderBy('bookings.created_at', 'DESC')
                     ->findAll();
     }
 }

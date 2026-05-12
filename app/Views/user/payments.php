@@ -1,60 +1,56 @@
-<?= $this->extend('layouts/user') ?>
+<?= $this->extend('layouts/admin') ?>
+
+<?= $this->section('sidebar') ?>
+<div class="nav-section">Menu Jamaah</div>
+<a class="nav-link" href="/user/dashboard"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a>
+<a class="nav-link" href="/user/bookings"><i class="fa-solid fa-kaaba"></i> Booking Saya</a>
+<a class="nav-link" href="/user/documents"><i class="fa-solid fa-file-invoice"></i> Dokumen</a>
+<a class="nav-link active" href="/user/payments"><i class="fa-solid fa-credit-card"></i> Riwayat Bayar</a>
+
+<div class="nav-section">Layanan</div>
+<a class="nav-link" href="/katalog"><i class="fa-solid fa-search"></i> Cari Paket</a>
+<?= $this->endSection() ?>
+
+<?= $this->section('page_title') ?>Riwayat Pembayaran<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="card card-elegant animate__animated animate__fadeInUp">
-    <div class="card-body p-0">
-        <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-2">
-            <h6 class="font-weight-bold text-dark mb-0">Riwayat Pembayaran</h6>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th>ID Booking</th>
-                        <th>Nama Paket</th>
-                        <th>Total Harga</th>
-                        <th>Metode Bayar</th>
-                        <th>Status Pembayaran</th>
-                        <th>Waktu Transaksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($bookings)): ?>
-                        <?php foreach ($bookings as $booking): ?>
-                            <tr>
-                                <td><span class="font-weight-bold"><?= esc($booking['order_id']) ?></span></td>
-                                <td><?= esc($booking['nama_paket']) ?></td>
-                                <td>Rp <?= number_format($booking['total_price'], 0, ',', '.') ?></td>
-                                <td><span class="small font-weight-bold text-uppercase"><?= esc($booking['payment_method'] ?? 'Online') ?></span></td>
-                                <td>
-                                    <?php
-                                        $paymentStatus = [
-                                            'pending'   => ['Menunggu', 'badge-pending'],
-                                            'success'   => ['Lunas', 'badge-verified'],
-                                            'failed'    => ['Gagal', 'badge-cancelled'],
-                                            'expired'   => ['Kadaluarsa', 'badge-cancelled'],
-                                        ];
-                                        $status = $paymentStatus[$booking['payment_status']] ?? ['Pending', 'badge-pending'];
-                                    ?>
-                                    <span class="badge-status <?= $status[1] ?>"><?= $status[0] ?></span>
-                                </td>
-                                <td class="small text-muted">
-                                    <?= $booking['transaction_time'] ? date('d M Y H:i', strtotime($booking['transaction_time'])) : '-' ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-credit-card fa-3x mb-3 d-block" style="color: #d1d5db;"></i>
-                                <h6>Belum Ada Riwayat Pembayaran</h6>
-                                <p class="small">Pembayaran akan muncul setelah Anda melakukan pemesanan.</p>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+<div class="card-section">
+    <h6><i class="fa-solid fa-history mr-2" style="color:#d4af37;"></i>Daftar Pembayaran</h6>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Paket</th>
+                    <th>Metode</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Waktu</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php if (!empty($bookings)): foreach ($bookings as $b): ?>
+                <tr>
+                    <td><strong><?= esc($b['booking_code']) ?></strong></td>
+                    <td><?= esc($b['nama_paket']) ?></td>
+                    <td><?= esc($b['payment_method'] ?: '-') ?></td>
+                    <td>Rp <?= number_format($b['total_price'], 0, ',', '.') ?></td>
+                    <td>
+                        <?php if ($b['payment_status'] === 'success'): ?>
+                            <span class="badge badge-success px-3 py-2" style="border-radius:20px;">Berhasil</span>
+                        <?php elseif ($b['payment_status'] === 'pending'): ?>
+                            <span class="badge badge-warning px-3 py-2" style="border-radius:20px;">Menunggu</span>
+                        <?php else: ?>
+                            <span class="badge badge-danger px-3 py-2" style="border-radius:20px;">Gagal</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= $b['transaction_time'] ? date('d/m/Y H:i', strtotime($b['transaction_time'])) : '-' ?></td>
+                </tr>
+            <?php endforeach; else: ?>
+                <tr><td colspan="6" class="text-center text-muted py-4">Belum ada riwayat pembayaran.</td></tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 <?= $this->endSection() ?>

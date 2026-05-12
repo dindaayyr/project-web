@@ -1,77 +1,154 @@
-<?= $this->extend('layouts/user') ?>
+<?= $this->extend('layouts/admin') ?>
+
+<?= $this->section('sidebar') ?>
+<div class="nav-section">Menu Jamaah</div>
+<a class="nav-link" href="/user/dashboard"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a>
+<a class="nav-link" href="/user/bookings"><i class="fa-solid fa-kaaba"></i> Booking Saya</a>
+<a class="nav-link active" href="/user/documents"><i class="fa-solid fa-file-invoice"></i> Dokumen</a>
+<a class="nav-link" href="/user/payments"><i class="fa-solid fa-credit-card"></i> Riwayat Bayar</a>
+
+<div class="nav-section">Layanan</div>
+<a class="nav-link" href="/katalog"><i class="fa-solid fa-search"></i> Cari Paket</a>
+<?= $this->endSection() ?>
+
+<?= $this->section('page_title') ?>Dokumen Perjalanan<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="card card-elegant animate__animated animate__fadeInUp">
-    <div class="card-body p-4">
-        <h6 class="font-weight-bold text-dark mb-4">Upload Dokumen Perjalanan</h6>
-        <p class="text-muted small mb-4">Upload dokumen yang diperlukan untuk perjalanan umroh Anda. Pastikan semua dokumen jelas dan masih berlaku.</p>
 
-        <div class="row">
-            <!-- KTP -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
-                    <div class="card-body text-center py-5">
-                        <div class="mb-3" style="width: 70px; height: 70px; background: var(--emerald-50); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-id-card fa-2x" style="color: var(--emerald-dark);"></i>
-                        </div>
-                        <h6 class="font-weight-bold">KTP</h6>
-                        <p class="text-muted small">Kartu Tanda Penduduk</p>
-                        <span class="badge-status badge-pending mb-3 d-inline-block">Belum Upload</span>
-                        <div>
-                            <label for="uploadKtp" class="btn btn-sm px-4" style="background: var(--emerald-dark); color: #fff; border-radius: 10px; cursor: pointer;">
-                                <i class="fa fa-upload mr-1"></i> Upload
-                            </label>
-                            <input type="file" id="uploadKtp" class="d-none" accept="image/*,.pdf">
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="alert alert-warning" style="border-radius:12px; border:none; background:#fff8e1; color:#f57c00;">
+    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+    Mohon lengkapi dokumen di bawah ini untuk proses administrasi keberangkatan Anda.
+</div>
 
-            <!-- Paspor -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
-                    <div class="card-body text-center py-5">
-                        <div class="mb-3" style="width: 70px; height: 70px; background: #ede9fe; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-passport fa-2x" style="color: #7c3aed;"></i>
+<form action="/user/documents/upload" method="POST" enctype="multipart/form-data">
+    <?= csrf_field() ?>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card-section h-100">
+                <h6><i class="fa-solid fa-passport mr-2" style="color:#d4af37;"></i>Paspor & Identitas</h6>
+                <ul class="list-group list-group-flush mt-3">
+                    <!-- PASPOR -->
+                    <li class="list-group-item bg-transparent px-0 border-light pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="font-weight-bold">Scan Paspor</div>
+                                <small class="text-muted">Format: JPG/PDF, Max 2MB</small>
+                            </div>
+                            <?php if (isset($docs['paspor'])): ?>
+                                <span class="badge badge-<?= $docs['paspor']['status'] === 'verified' ? 'success' : ($docs['paspor']['status'] === 'rejected' ? 'danger' : 'warning') ?> px-2 py-1">
+                                    <?= ucfirst($docs['paspor']['status']) ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-danger px-2 py-1">Belum Upload</span>
+                            <?php endif; ?>
                         </div>
-                        <h6 class="font-weight-bold">Paspor</h6>
-                        <p class="text-muted small">Passport (min. 7 bulan berlaku)</p>
-                        <span class="badge-status badge-pending mb-3 d-inline-block">Belum Upload</span>
-                        <div>
-                            <label for="uploadPaspor" class="btn btn-sm px-4" style="background: var(--emerald-dark); color: #fff; border-radius: 10px; cursor: pointer;">
-                                <i class="fa fa-upload mr-1"></i> Upload
-                            </label>
-                            <input type="file" id="uploadPaspor" class="d-none" accept="image/*,.pdf">
+                        <div class="custom-file custom-file-sm">
+                            <input type="file" name="paspor" class="custom-file-input" id="inputPaspor" accept=".jpg,.jpeg,.png,.pdf">
+                            <label class="custom-file-label" for="inputPaspor">Pilih file paspor...</label>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        <?php if (isset($docs['paspor'])): ?>
+                            <small class="text-primary mt-1 d-block"><i class="fa fa-eye mr-1"></i> <a href="/<?= $docs['paspor']['file_path'] ?>" target="_blank">Lihat file saat ini</a></small>
+                        <?php endif; ?>
+                    </li>
 
-            <!-- Foto -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
-                    <div class="card-body text-center py-5">
-                        <div class="mb-3" style="width: 70px; height: 70px; background: rgba(212,175,55,0.1); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-camera fa-2x" style="color: var(--gold-accent);"></i>
+                    <!-- KTP -->
+                    <li class="list-group-item bg-transparent px-0 border-light pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="font-weight-bold">Scan KTP</div>
+                                <small class="text-muted">Format: JPG, Max 1MB</small>
+                            </div>
+                            <?php if (isset($docs['ktp'])): ?>
+                                <span class="badge badge-<?= $docs['ktp']['status'] === 'verified' ? 'success' : ($docs['ktp']['status'] === 'rejected' ? 'danger' : 'warning') ?> px-2 py-1">
+                                    <?= ucfirst($docs['ktp']['status']) ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-danger px-2 py-1">Belum Upload</span>
+                            <?php endif; ?>
                         </div>
-                        <h6 class="font-weight-bold">Pas Foto</h6>
-                        <p class="text-muted small">4x6 background putih</p>
-                        <span class="badge-status badge-pending mb-3 d-inline-block">Belum Upload</span>
-                        <div>
-                            <label for="uploadFoto" class="btn btn-sm px-4" style="background: var(--emerald-dark); color: #fff; border-radius: 10px; cursor: pointer;">
-                                <i class="fa fa-upload mr-1"></i> Upload
-                            </label>
-                            <input type="file" id="uploadFoto" class="d-none" accept="image/*">
+                        <div class="custom-file">
+                            <input type="file" name="ktp" class="custom-file-input" id="inputKTP" accept=".jpg,.jpeg,.png">
+                            <label class="custom-file-label" for="inputKTP">Pilih file KTP...</label>
                         </div>
-                    </div>
-                </div>
+                        <?php if (isset($docs['ktp'])): ?>
+                            <small class="text-primary mt-1 d-block"><i class="fa fa-eye mr-1"></i> <a href="/<?= $docs['ktp']['file_path'] ?>" target="_blank">Lihat file saat ini</a></small>
+                        <?php endif; ?>
+                    </li>
+
+                    <!-- FOTO -->
+                    <li class="list-group-item bg-transparent px-0 border-light pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="font-weight-bold">Foto 4x6 (Background Putih)</div>
+                                <small class="text-muted">Format: JPG, Max 1MB</small>
+                            </div>
+                            <?php if (isset($docs['foto'])): ?>
+                                <span class="badge badge-<?= $docs['foto']['status'] === 'verified' ? 'success' : ($docs['foto']['status'] === 'rejected' ? 'danger' : 'warning') ?> px-2 py-1">
+                                    <?= ucfirst($docs['foto']['status']) ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-danger px-2 py-1">Belum Upload</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" name="foto" class="custom-file-input" id="inputFoto" accept=".jpg,.jpeg,.png">
+                            <label class="custom-file-label" for="inputFoto">Pilih file foto...</label>
+                        </div>
+                        <?php if (isset($docs['foto'])): ?>
+                            <small class="text-primary mt-1 d-block"><i class="fa fa-eye mr-1"></i> <a href="/<?= $docs['foto']['file_path'] ?>" target="_blank">Lihat file saat ini</a></small>
+                        <?php endif; ?>
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <div class="alert mt-3 border-0" style="background: #fef3c7; color: #92400e; border-radius: 12px;">
-            <i class="fa fa-info-circle mr-2"></i>
-            <strong>Catatan:</strong> Fitur upload dokumen akan aktif setelah integrasi backend file storage selesai.
+        <div class="col-md-6 mb-4">
+            <div class="card-section h-100">
+                <h6><i class="fa-solid fa-notes-medical mr-2" style="color:#d4af37;"></i>Kesehatan & Vaksin</h6>
+                <ul class="list-group list-group-flush mt-3">
+                    <!-- MENINGITIS -->
+                    <li class="list-group-item bg-transparent px-0 border-light pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <div class="font-weight-bold">Sertifikat Vaksin Meningitis</div>
+                                <small class="text-muted">Wajib untuk visa umroh</small>
+                            </div>
+                            <?php if (isset($docs['meningitis'])): ?>
+                                <span class="badge badge-<?= $docs['meningitis']['status'] === 'verified' ? 'success' : ($docs['meningitis']['status'] === 'rejected' ? 'danger' : 'warning') ?> px-2 py-1">
+                                    <?= ucfirst($docs['meningitis']['status']) ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-danger px-2 py-1">Belum Upload</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" name="meningitis" class="custom-file-input" id="inputMeningitis" accept=".jpg,.jpeg,.png,.pdf">
+                            <label class="custom-file-label" for="inputMeningitis">Pilih file sertifikat...</label>
+                        </div>
+                        <?php if (isset($docs['meningitis'])): ?>
+                            <small class="text-primary mt-1 d-block"><i class="fa fa-eye mr-1"></i> <a href="/<?= $docs['meningitis']['file_path'] ?>" target="_blank">Lihat file saat ini</a></small>
+                        <?php endif; ?>
+                    </li>
+                </ul>
+                
+                <div class="mt-auto">
+                    <button type="submit" class="btn btn-primary btn-block mt-4" style="border-radius:12px; height:50px; font-weight:600; background:linear-gradient(135deg, #004d40 0%, #00695c 100%); border:none; box-shadow: 0 4px 15px rgba(0,77,64,0.3);">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Simpan & Unggah Dokumen
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</form>
+
+<script>
+    // Update label with filename
+    document.querySelectorAll('.custom-file-input').forEach(input => {
+        input.addEventListener('change', function(e) {
+            var fileName = e.target.files[0].name;
+            var nextSibling = e.target.nextElementSibling;
+            nextSibling.innerText = fileName;
+        });
+    });
+</script>
 <?= $this->endSection() ?>

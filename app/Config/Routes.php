@@ -21,12 +21,16 @@ $routes->group('user', ['filter' => 'role:jamaah'], function($routes) {
     $routes->get('dashboard', 'User\DashboardController::index');
     $routes->get('bookings', 'User\DashboardController::bookings');
     $routes->get('bookings/(:num)', 'User\DashboardController::bookingDetail/$1');
+    $routes->get('documents', 'User\DashboardController::documents');
+    $routes->post('documents/upload', 'User\DashboardController::uploadDocuments');
+    $routes->get('payments', 'User\DashboardController::payments');
     $routes->post('bookings/pay/(:num)', 'User\DashboardController::pay/$1');
 });
 
 // ===== FINANCE DASHBOARD (Protected) =====
 $routes->group('finance', ['filter' => 'role:finance'], function($routes) {
     $routes->get('dashboard', 'Finance\DashboardController::index');
+    $routes->get('transactions', 'Finance\DashboardController::transactions');
     $routes->get('disbursements', 'Finance\DisbursementController::index');
     $routes->post('disbursements/process/(:num)', 'Finance\DisbursementController::process/$1');
 });

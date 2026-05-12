@@ -23,7 +23,10 @@ class DashboardController extends BaseController
             'totalBookings' => $bookingModel->countAll(),
             'totalUsers'    => $userModel->where('role', 'jamaah')->countAllResults(),
             'latestBookings' => $bookingModel
-                ->select('bookings.*, users.name as user_name, paket_umroh.nama_paket as package_name')
+                ->select('bookings.*')
+                ->select('bookings.order_id as booking_code')
+                ->select('bookings.payment_status as status')
+                ->select('users.name as user_name, paket_umroh.nama_paket as package_name')
                 ->join('users', 'users.id = bookings.user_id')
                 ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                 ->orderBy('bookings.created_at', 'DESC')
@@ -75,7 +78,10 @@ class DashboardController extends BaseController
         $bookingModel = new BookingModel();
         $data = [
             'bookings' => $bookingModel
-                ->select('bookings.*, users.name as user_name, paket_umroh.nama_paket as package_name')
+                ->select('bookings.*')
+                ->select('bookings.order_id as booking_code')
+                ->select('bookings.payment_status as status')
+                ->select('users.name as user_name, paket_umroh.nama_paket as package_name')
                 ->join('users', 'users.id = bookings.user_id')
                 ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
                 ->orderBy('bookings.created_at', 'DESC')
