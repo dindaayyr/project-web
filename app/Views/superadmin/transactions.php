@@ -12,39 +12,188 @@
 
 <?= $this->section('page_title') ?>Laporan Transaksi (Global)<?= $this->endSection() ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px; }
+    .stat-widget { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-widget:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .stat-widget .icon-box { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .stat-widget .info h3 { font-weight: 700; font-size: 1.4rem; margin: 0 0 2px; }
+    .stat-widget .info small { color: #6b7280; font-size: 0.78rem; }
+    .icon-revenue { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #166534; }
+    .icon-commission { background: linear-gradient(135deg, #fef9c3, #fde68a); color: #854d0e; }
+    .icon-success { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+    .icon-pending { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #b71c1c; }
+    .badge-status { padding: 5px 14px; border-radius: 20px; font-size: 0.76rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+    .badge-success-custom { background: #dcfce7; color: #166534; }
+    .badge-pending-custom { background: #fef9c3; color: #854d0e; }
+    .badge-failed-custom { background: #fee2e2; color: #991b1b; }
+    .badge-disbursed-custom { background: #dbeafe; color: #1e40af; }
+    .btn-refresh { background: linear-gradient(135deg, #047857, #064e3b); color: #fff; border: none; border-radius: 10px; padding: 8px 18px; font-size: 0.82rem; font-weight: 600; transition: all 0.3s; }
+    .btn-refresh:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(4,120,87,0.3); color: #fff; }
+    .btn-sync { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 8px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; }
+    .btn-sync:hover { background: #166534; color: #fff; }
+    .profit-col { color: #d4af37; font-weight: 700; }
+    .table-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
+
+<!-- Stats Cards -->
+<div class="stats-row">
+    <div class="stat-widget">
+        <div class="icon-box icon-revenue"><i class="fa-solid fa-coins"></i></div>
+        <div class="info">
+            <h3>Rp <?= number_format($totalRevenue, 0, ',', '.') ?></h3>
+            <small>Total Revenue (Success)</small>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="icon-box icon-commission"><i class="fa-solid fa-percent"></i></div>
+        <div class="info">
+            <h3>Rp <?= number_format($totalCommission, 0, ',', '.') ?></h3>
+            <small>Komisi Platform (<?= $commissionRate ?>%)</small>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="icon-box icon-success"><i class="fa-solid fa-check-circle"></i></div>
+        <div class="info">
+            <h3><?= $totalSuccess ?></h3>
+            <small>Transaksi Berhasil</small>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="icon-box icon-pending"><i class="fa-solid fa-clock"></i></div>
+        <div class="info">
+            <h3><?= $totalPending ?></h3>
+            <small>Transaksi Pending</small>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Table -->
 <div class="card-section">
+    <div class="table-section-header">
+        <h6 style="margin:0;"><i class="fa-solid fa-file-invoice-dollar mr-2" style="color:#d4af37;"></i>Semua Transaksi (<?= $totalAll ?> data)</h6>
+        <div>
+            <button class="btn-refresh" onclick="location.reload()">
+                <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh Data
+            </button>
+        </div>
+    </div>
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover" id="transactionTable">
             <thead>
                 <tr>
-                    <th>Kode Booking</th>
+                    <th style="cursor:pointer;" onclick="sortTable(0)">Kode Booking <i class="fa-solid fa-sort fa-xs"></i></th>
                     <th>Jamaah</th>
                     <th>Paket Umroh</th>
-                    <th>Total Bayar</th>
-                    <th>Status</th>
-                    <th>Tanggal</th>
+                    <th>Agen Travel</th>
+                    <th style="cursor:pointer;" onclick="sortTable(4)">Total Bayar <i class="fa-solid fa-sort fa-xs"></i></th>
+                    <th>Net Profit Platform</th>
+                    <th>Status Bayar</th>
+                    <th>Settlement</th>
+                    <th style="cursor:pointer;" onclick="sortTable(8)">Tanggal <i class="fa-solid fa-sort fa-xs"></i></th>
+                    <th>Sync</th>
                 </tr>
             </thead>
             <tbody>
-            <?php if (!empty($bookings)): foreach ($bookings as $b): ?>
+            <?php if (!empty($bookings)): foreach ($bookings as $b):
+                $totalPrice = (float)($b['total_price'] ?? 0);
+                $netProfit = round($totalPrice * ($commissionRate / 100), 2);
+                $status = $b['status'] ?? 'unknown';
+                $settlement = $b['settlement_status'] ?? 'pending';
+
+                // Badge class
+                if (in_array($status, ['success', 'lunas', 'settlement'])) {
+                    $badgeClass = 'badge-success-custom';
+                    $badgeIcon = 'fa-check-circle';
+                    $badgeLabel = 'Success';
+                } elseif ($status === 'pending') {
+                    $badgeClass = 'badge-pending-custom';
+                    $badgeIcon = 'fa-clock';
+                    $badgeLabel = 'Pending';
+                } else {
+                    $badgeClass = 'badge-failed-custom';
+                    $badgeIcon = 'fa-times-circle';
+                    $badgeLabel = ucfirst($status);
+                }
+
+                // Settlement badge
+                if ($settlement === 'processed') {
+                    $settleBadge = 'badge-disbursed-custom';
+                    $settleLabel = 'Dicairkan';
+                } else {
+                    $settleBadge = 'badge-pending-custom';
+                    $settleLabel = 'Belum Cair';
+                }
+            ?>
                 <tr>
-                    <td><span class="font-weight-bold text-primary"><?= esc($b['booking_code']) ?></span></td>
-                    <td><?= esc($b['user_name']) ?></td>
-                    <td><?= esc($b['package_name']) ?></td>
-                    <td><strong>Rp <?= number_format($b['total_price'], 0, ',', '.') ?></strong></td>
+                    <td><span class="font-weight-bold" style="color:#047857;"><?= esc($b['booking_code']) ?></span></td>
+                    <td><?= esc($b['user_name'] ?? $b['jamaah_name'] ?? '-') ?></td>
+                    <td><?= esc($b['nama_paket'] ?? '-') ?></td>
+                    <td><span class="text-muted"><?= esc($b['travel_name'] ?? '-') ?></span></td>
+                    <td><strong>Rp <?= number_format($totalPrice, 0, ',', '.') ?></strong></td>
+                    <td class="profit-col">Rp <?= number_format($netProfit, 0, ',', '.') ?></td>
                     <td>
-                        <span class="badge badge-<?= $b['status'] === 'lunas' ? 'lunas' : ($b['status'] === 'pending' ? 'pending' : 'cancelled') ?> px-3 py-1" style="border-radius:12px;">
-                            <?= ucfirst($b['status']) ?>
+                        <span class="badge-status <?= $badgeClass ?>">
+                            <i class="fa-solid <?= $badgeIcon ?>"></i> <?= $badgeLabel ?>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge-status <?= $settleBadge ?>">
+                            <?= $settleLabel ?>
                         </span>
                     </td>
                     <td><?= date('d/m/Y H:i', strtotime($b['created_at'])) ?></td>
+                    <td>
+                        <?php if ($status === 'pending'): ?>
+                        <form method="POST" action="/superadmin/transactions/refresh/<?= $b['id'] ?>" style="display:inline;">
+                            <button type="submit" class="btn-sync" title="Sinkronisasi status dari Midtrans">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </form>
+                        <?php else: ?>
+                            <span class="text-muted">—</span>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; else: ?>
-                <tr><td colspan="6" class="text-center text-muted py-4">Belum ada transaksi terekam.</td></tr>
+                <tr><td colspan="10" class="text-center text-muted py-4">Belum ada transaksi terekam.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
     </div>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+let sortDirection = {};
+function sortTable(colIndex) {
+    const table = document.getElementById('transactionTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    if (rows.length <= 1 && rows[0]?.cells.length === 1) return;
+
+    sortDirection[colIndex] = !sortDirection[colIndex];
+    const dir = sortDirection[colIndex] ? 1 : -1;
+
+    rows.sort((a, b) => {
+        let aText = a.cells[colIndex]?.textContent.trim() || '';
+        let bText = b.cells[colIndex]?.textContent.trim() || '';
+
+        // Try numeric
+        let aNum = parseFloat(aText.replace(/[^0-9.-]/g, ''));
+        let bNum = parseFloat(bText.replace(/[^0-9.-]/g, ''));
+        if (!isNaN(aNum) && !isNaN(bNum)) return (aNum - bNum) * dir;
+
+        return aText.localeCompare(bText) * dir;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+</script>
 <?= $this->endSection() ?>

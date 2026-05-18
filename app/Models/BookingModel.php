@@ -102,4 +102,42 @@ class BookingModel extends Model
                     ->orderBy('bookings.created_at', 'DESC')
                     ->findAll();
     }
+
+    /**
+     * Get ALL bookings with full details (SuperAdmin global view)
+     */
+    public function getAllWithDetails()
+    {
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, paket_umroh.harga_jual as package_price')
+                    ->select('travel_agents.name as travel_name')
+                    ->select('users.name as user_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
+                    ->join('users', 'users.id = bookings.user_id', 'left')
+                    ->orderBy('bookings.created_at', 'DESC')
+                    ->findAll();
+    }
+
+    /**
+     * Get settled bookings with full details for Finance disbursement view
+     * Only returns bookings that are success but NOT yet disbursed
+     */
+    public function getSettledWithDetails()
+    {
+        return $this->select('bookings.*')
+                    ->select('bookings.order_id as booking_code')
+                    ->select('bookings.payment_status as status')
+                    ->select('paket_umroh.nama_paket, paket_umroh.tanggal_berangkat, paket_umroh.harga_jual as package_price')
+                    ->select('travel_agents.name as travel_name')
+                    ->select('users.name as user_name')
+                    ->join('paket_umroh', 'paket_umroh.id_paket = bookings.package_id')
+                    ->join('travel_agents', 'travel_agents.id = bookings.travel_agent_id')
+                    ->join('users', 'users.id = bookings.user_id', 'left')
+                    ->whereIn('bookings.payment_status', ['success', 'lunas', 'settlement'])
+                    ->orderBy('bookings.created_at', 'DESC')
+                    ->findAll();
+    }
 }

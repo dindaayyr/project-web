@@ -31,6 +31,7 @@ $routes->group('user', ['filter' => 'role:jamaah'], function($routes) {
 $routes->group('finance', ['filter' => 'role:finance'], function($routes) {
     $routes->get('dashboard', 'Finance\DashboardController::index');
     $routes->get('transactions', 'Finance\DashboardController::transactions');
+    $routes->post('transactions/refresh/(:num)', 'Finance\DashboardController::refreshStatus/$1');
     $routes->get('disbursements', 'Finance\DisbursementController::index');
     $routes->post('disbursements/process/(:num)', 'Finance\DisbursementController::process/$1');
 });
@@ -53,6 +54,7 @@ $routes->group('superadmin', ['filter' => 'role:superadmin'], function($routes) 
     $routes->get('users/delete/(:num)', 'SuperAdmin\UserController::delete/$1');
     
     $routes->get('transactions', 'SuperAdmin\DashboardController::transactions');
+    $routes->post('transactions/refresh/(:num)', 'SuperAdmin\DashboardController::refreshStatus/$1');
     
     // Packages CRUD
     $routes->get('packages', 'SuperAdmin\PackageController::index');

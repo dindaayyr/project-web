@@ -25,4 +25,13 @@ class MidtransLib
     {
         return new Notification();
     }
+
+    /**
+     * Get transaction status from Midtrans API
+     * Used for manual sync/refresh
+     */
+    public function getTransactionStatus($orderId)
+    {
+        return \Midtrans\Transaction::status($orderId);
+    }
 }

@@ -153,7 +153,12 @@
 
 <?= $this->section('scripts') ?>
 <!-- Midtrans Snap JS -->
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= env('MIDTRANS_CLIENT_KEY') ?>"></script>
+<?php
+    $snapUrl = env('MIDTRANS_IS_PRODUCTION', false) === 'true'
+        ? 'https://app.midtrans.com/snap/snap.js'
+        : 'https://app.sandbox.midtrans.com/snap/snap.js';
+?>
+<script src="<?= $snapUrl ?>" data-client-key="<?= env('MIDTRANS_CLIENT_KEY') ?>"></script>
 
 <script>
     document.getElementById('payment-form').addEventListener('submit', function(e) {
